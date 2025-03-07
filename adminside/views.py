@@ -1,22 +1,113 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404  # type: ignore
 from .forms import CustomPasswordChangeForm
-from api.serializers import TableSerializer
 from adminside.models import Table
-from rest_framework.decorators import api_view
-from django.db import connection
-
+from django.db import connection # type: ignore
+from .models import Staff,Branch
+from .forms import StaffForm,BranchForm
+from django.contrib import messages # type: ignore
+from django.utils import timezone # type: ignore
 
 def home(request):
     return redirect('adminside:dashboard')
 
 def render_page(request, template, data=None):
-    return render(request, "adminside/base.html", {"template": template, "data":data})
+    context = {
+        "template": template,
+        "user": request.user, 
+        "login_date": request.session.get('login_date'),
+    }
+
+    if request.user.is_authenticated:
+        print(request.user.staff_username) 
+    else:
+        print("User is not authenticated")
+
+    if data:
+        context.update(data)
+    return render(request, "adminside/base.html", context)
+
+
+def staff(request):
+    branches = Branch.objects.all() 
+    staff_members = Staff.objects.all()
+
+    if request.method == 'POST':
+        if 'delete_staff_id' in request.POST:  # Check if delete request is made
+            staff_id = request.POST.get('delete_staff_id')
+            staff = get_object_or_404(Staff, staff_id=staff_id)
+            staff.delete()
+            messages.success(request, "Staff member deleted successfully.")
+            return redirect('adminside:staff')
+
+        staff_id = request.POST.get('staff_id')
+
+        if staff_id:
+            staff = Staff.objects.get(staff_id=staff_id)
+            form = StaffForm(request.POST, request.FILES, instance=staff)
+        else:
+            form = StaffForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            staff = form.save(commit=False)
+            staff.is_active = request.POST.get("is_active") == "True"  # Convert to Boolean
+            staff.date_joined = request.POST.get("date_joined") or timezone.now().date()
+            staff.save()
+
+            return redirect('adminside:staff')
+        else:
+            print(form.errors)
+
+    else:
+        form = StaffForm()
+
+    return render_page(request, "adminside/staff.html", {"staff_members": staff_members, "branches": branches,"form": form,})
+
+def branches(request):
+    branches = Branch.objects.all()
+    staff_members = Staff.objects.filter(staff_role="Manager")
+
+    if request.method == 'POST':
+        if 'delete_branch_id' in request.POST:
+            branch_id = request.POST.get('delete_branch_id')
+            if branch_id:
+                branch = get_object_or_404(Branch, branch_id=branch_id)
+                branch.delete()
+                messages.success(request, "Branch deleted successfully.")
+                return redirect('adminside:branches')
+
+        branch_id = request.POST.get('branch_id')
+
+        if branch_id:
+            try:
+                branch = Branch.objects.get(branch_id=int(branch_id))
+                form = BranchForm(request.POST, instance=branch)
+            except (Branch.DoesNotExist, ValueError):
+                messages.error(request, "Invalid branch ID.")
+                return redirect('adminside:branches')
+        else:
+            form = BranchForm(request.POST)
+
+        if form.is_valid():
+            branch = form.save(commit=False)
+            manager_id = request.POST.get("manager_id")
+            if manager_id:
+                branch.manager = Staff.objects.get(staff_id=manager_id)
+            else:
+                branch.manager = None
+
+            branch.is_active = request.POST.get("is_active") == "True"  
+            branch.save()
+            messages.success(request, "Branch updated successfully." if branch_id else "Branch added successfully.")
+            return redirect('adminside:branches')
+        else:
+            print(form.errors)
+    else:
+        form = StaffForm()
+
+    return render_page(request, "adminside/branches.html", {"branches": branches, "staff_members": staff_members, "form": form})
 
 def dashboard(request):
     return render_page(request, 'adminside/dashboard.html')
-
-def branches(request):   
-    return render_page(request, 'adminside/branches.html')
 
 def suppliers(request):
     return render_page(request, 'adminside/suppliers.html')
@@ -38,9 +129,6 @@ def tables(request):
 
 def customer(request):
     return render_page(request, 'adminside/customer.html')
-
-def staff(request):
-    return render_page(request, 'adminside/staff.html')
 
 def reports(request):
     sales_data = [

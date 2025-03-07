@@ -121,8 +121,6 @@
     display: flex;
     gap: 10px;
 }
-
-
 /* when form popup then background overlay */
 .overlay {
     position: fixed;

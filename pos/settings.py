@@ -42,7 +42,6 @@ INSTALLED_APPS = [
      "staffside",
      "accounts",
      'rest_framework',
-     "api",
 ]
 
 MIDDLEWARE = [
@@ -54,6 +53,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"  # Stores session in database
+
 
 ROOT_URLCONF = 'pos.urls'
 
@@ -129,7 +131,22 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'adminside/static/'),os.path.join(BASE_DIR, 'staffside/static/')]
 STATIC_ROOT = BASE_DIR / "staticfiles" 
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'vishjshah19@gmail.com' 
+EMAIL_HOST_PASSWORD = 'pgdb zhpx qmzw fvvu'
+
+AUTH_USER_MODEL = 'adminside.Staff'

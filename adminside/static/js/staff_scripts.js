@@ -1,4 +1,3 @@
-// Toggle search input on small devices
 function toggleSearch() {
   let searchContainer = document.querySelector(".search-container");
   let searchInput = document.querySelector(".search-input");
@@ -9,7 +8,6 @@ function toggleSearch() {
   }
 }
 
-// Search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
   let filter = this.value.toLowerCase();
   let rows = document.querySelectorAll("#staffBody tr");
@@ -26,218 +24,145 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
   });
 });
 
-let ID = 1;
-let updateIndex = null; // Customers the row reference for updating
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+  document.getElementById("overlay").style.display = "block"; 
+}
 
-document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("staffForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      if (validateForm()) {
-        if (updateIndex !== null) {
-          saveUpdatedStaff(); // Update existing row
-        } else {
-          addStaff(); // Add new row
-        }
-      }
-    });
-});
+function closeForm() {
+  document.getElementById("myForm").style.display = "none"; 
+  document.getElementById("overlay").style.display = "none"; 
+}
 
-// Form validation function
-function validateForm() {
-  let email = document.getElementById("email");
-  let password = document.getElementById("password");
-  let staffRole = document.getElementById("staffRole");
-  let branch = document.getElementById("branches");
+document.querySelector(".add-staff-button").addEventListener("click", openForm);
 
-  let emailValue = email.value.trim();
-  let passwordValue = password.value.trim();
-  let staffRoleValue = staffRole.value.trim();
-  let branchValue = branch.value.trim();
+document.querySelector(".cancel").addEventListener("click", closeForm);
 
-  // Regular expressions for validation
-  let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Valid email format
-  let passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Min 8 chars, 1 special character & 1 uppercase , 1 lowercase ,1 number
+document.getElementById("staffForm").addEventListener("submit", validateForm);
 
-  // Remove previous error messages
-  clearErrors();
+function clearErrors() {
+  document.querySelectorAll(".error-message").forEach((element) => element.remove());
+}
+
+function showError(inputId, message) {
+  const inputElement = document.getElementById(inputId);
+  const inputGroup = inputElement.closest(".input-group"); 
+  
+  if (!inputGroup) return; 
+  
+  let existingError = inputGroup.querySelector(".error-message");
+  if (existingError) {
+    existingError.textContent = message;
+    return;
+  }
+  const errorElement = document.createElement("div");
+  errorElement.className = "error-message";
+  errorElement.style.color = "red";
+  errorElement.style.fontSize = "12px";
+  errorElement.textContent = message;
+  
+  inputGroup.appendChild(errorElement); 
+}
+
+function isValidEmail(email) {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+  return emailPattern.test(email);
+}
+
+function validateForm(event) {
+  event.preventDefault(); 
+  clearErrors(); 
+
   let isValid = true;
 
-  // Email Validation
-  if (!emailRegex.test(emailValue)) {
-    showError(email, "Enter a valid email (e.g., user@example.com)");
-    isValid = false;
+  const email = document.getElementById("staff_email").value.trim();
+  const phone = document.getElementById("staff_phone").value.trim();
+  const password = document.getElementById("staff_password").value.trim();
+  const fullname = document.getElementById("staff_fullname").value.trim();
+  const username = document.getElementById("staff_username").value.trim();
+  const role = document.getElementById("staff_role").value;
+  const branch = document.getElementById("branch").value;
+
+  if (email === "" || !isValidEmail(email)) {
+      showError("staff_email", "Enter a valid email address");
+      isValid = false;
   }
 
-  // Password Validation
-  if (!passwordRegex.test(passwordValue)) {
-    showError(
-      password,
-      "Password must be at least 8 characters, with at least 1 Uppercase, 1 lowercase , 1 special character and 1 number."
-    );
-    isValid = false;
+  const phonePattern = /^[6789]\d{9}$/;
+  if (phone === "" || !phonePattern.test(phone)) {
+      showError("staff_phone", "Phone must start with 6,7,8,9 & be 10 digits");
+      isValid = false;
   }
 
-  if (!staffRoleValue) {
-    showError(staffRole, "Staff selection is required.");
-    isValid = false;
+  const passwordPattern = /^(?=.*[A-Z])(?=.*[\W]).{6,}$/;
+  if (password === "" || !passwordPattern.test(password)) {
+      showError("staff_password", "Password must be 6+ chars, 1 uppercase, 1 special character");
+      isValid = false;
   }
-
-  if (!branchValue) {
-    showError(branch, "Branch selection is required.");
-    isValid = false;
+  if (fullname === "") {
+      showError("staff_fullname", "Full name is required");
+      isValid = false;
   }
-
-  return isValid;
-}
-
-// Function to display error messages
-function showError(input, message) {
-  let errorSpan = document.createElement("span");
-  errorSpan.classList.add("error-message");
-  errorSpan.style.color = "red";
-  errorSpan.style.fontSize = "12px";
-  errorSpan.innerText = message;
-  input.parentNode.appendChild(errorSpan);
-}
-
-function addStaff() {
-  if (!validateForm()) {
-    return; // STOP adding data if validation fails
+  if (username === "") {
+      showError("staff_username", "Username is required");
+      isValid = false;
   }
-
-  const defaultImageUrl = document
-    .getElementById("defaultImagePath")
-    .getAttribute("data-path");
-
-  let fullName = document.getElementById("fullName").value;
-  let userName = document.getElementById("userName").value;
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
-  let staffRole = document.getElementById("staffRole").value;
-  let branch = document.getElementById("branches").value;
-  let staffImageInput = document.getElementById("staffImage");
-
-  let staffImage =
-    staffImageInput.files.length > 0 ? staffImageInput.files[0] : null;
-
-  let imageUrl = staffImage ? URL.createObjectURL(staffImage) : defaultImageUrl;
-
-  let newRow = document.createElement("tr");
-  newRow.innerHTML = `
-        <td>${ID}</td>
-        <td><img src="${imageUrl}" class="food-img" width="50"></td>
-        <td>${fullName}</td>
-        <td>${userName}</td>
-        <td>${email}</td>
-        <td>${password}</td>
-        <td>${staffRole}</td>
-        <td>${branch}</td>
-        <td class="action-buttons">
-            <button class="update-btn" onclick="updateRow(this)"><i class="fas fa-edit"></i></button>
-            <button class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-        </td>
-    `;
-  document.getElementById("staffBody").appendChild(newRow);
-  ID++; // Increment ID
-  document.getElementById("staffForm").reset();
-  closeForm();
-}
-
-// Function to update a row
-function updateRow(button) {
-  let row = button.closest("tr");
-  let columns = row.getElementsByTagName("td");
-
-  document.getElementById("fullName").value = columns[2].innerText;
-  document.getElementById("userName").value = columns[3].innerText;
-  document.getElementById("email").value = columns[4].innerText;
-  document.getElementById("password").value = columns[5].innerText;
-  document.getElementById("staffRole").value = columns[6].innerText;
-  document.getElementById("branches").value = columns[7].innerText;
-
-  let image = document.getElementById("staffImage");
-  if (image) {
-    image.src = columns[1].querySelector("img").src;
+  if (!role) {
+      showError("staff_role", "Select a staff role");
+      isValid = false;
   }
-
-  updateIndex = row; // Staff reference to the row for updating
-  openForm(true);
-}
-
-// Function to save the updated customer details
-function saveUpdatedStaff() {
-  if (updateIndex) {
-    const defaultImageUrl = document
-      .getElementById("defaultImagePath")
-      .getAttribute("data-path");
-
-    let fullName = document.getElementById("fullName").value.trim();
-    let userName = document.getElementById("userName").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let password = document.getElementById("password").value.trim();
-    let staffRole = document.getElementById("staffRole").value.trim();
-    let branch = document.getElementById("branches").value.trim();
-    let staffImageInput = document.getElementById("staffImage");
-
-    let staffImage =
-      staffImageInput.files.length > 0 ? staffImageInput.files[0] : null;
-
-    let imageUrl = staffImage
-      ? URL.createObjectURL(staffImage)
-      : defaultImageUrl;
-
-    updateIndex.cells[1].innerHTML = `<img src="${imageUrl}" class="food-img" width="50">`;
-    updateIndex.cells[2].textContent = fullName;
-    updateIndex.cells[3].textContent = userName;
-    updateIndex.cells[4].textContent = email;
-    updateIndex.cells[5].textContent = password;
-    updateIndex.cells[6].textContent = staffRole;
-    updateIndex.cells[7].textContent = branch;
-
-    updateIndex = null; // Reset after update
-    document.getElementById("staffForm").reset();
-    closeForm();
+  if (!branch) {
+      showError("branch", "Select a branch");
+      isValid = false;
+  }
+  if (isValid) {
+      document.getElementById("staffForm").submit(); 
   }
 }
 
-// Function to delete a row
-function deleteRow(button) {
-  button.closest("tr").remove();
-}
 
-// Open form modal
-function openForm() {
-  document.getElementById("overlay").style.display = "block";
-  document.getElementById("myForm").style.display = "block";
-  document.body.classList.add("popup-open");
+document.addEventListener("DOMContentLoaded", function () {
+  window.openForm = function (isUpdate, staffData = {}) {
+      document.getElementById("myForm").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
 
-  if (!isUpdate) {
-    resetForm(); // Clears the form when adding a new staff
-    updateIndex = null; // Clear any previous update reference
-  }
-}
+      document.getElementById("staffForm").reset();
 
-// Close form modal
-function closeForm() {
-  document.getElementById("overlay").style.display = "none";
-  document.getElementById("myForm").style.display = "none";
-  document.body.classList.remove("popup-open");
+      if (isUpdate) {
+          document.getElementById("staff_id").value = staffData.staff_id;
+          document.getElementById("staff_fullname").value = staffData.staff_fullname;
+          document.getElementById("staff_username").value = staffData.staff_username;
+          document.getElementById("staff_email").value = staffData.staff_email;
+          document.getElementById("staff_password").value = "******"; 
+          document.getElementById("staff_role").value = staffData.staff_role;
+          document.getElementById("staff_phone").value = staffData.staff_phone;
+          document.getElementById("branch").value = staffData.branch;
+          document.getElementById("date_joined").value = staffData.date_joined;
+          document.getElementById("is_active").value = staffData.is_active ? "True" : "False";
+      }
+  };
 
-  resetForm(); // Ensure form resets when closing
-  updateIndex = null; // Reset update index when closing
-}
+  window.closeForm = function () {
+      document.getElementById("myForm").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+  };
 
-// Function to reset the form
-function resetForm() {
-  document.getElementById("staffForm").reset();
-}
+  document.querySelectorAll(".update-btn").forEach(button => {
+      button.addEventListener("click", function () {
+          let row = this.closest("tr");
+          let staffData = {
+              staff_id: row.children[0].textContent.trim(),
+              staff_fullname: row.children[2].textContent.trim(),
+              staff_username: row.children[3].textContent.trim(),
+              staff_email: row.children[4].textContent.trim(),
+              staff_role: row.children[6].textContent.trim(),
+              staff_phone: row.children[7].textContent.trim(),
+              branch: row.children[8].textContent.trim(),
+              date_joined: row.children[9].textContent.trim(),
+              is_active:row.children[10].textContent.trim() === "Active"
+          };
 
-// Function to clear all error messages
-function clearErrors() {
-  document.querySelectorAll(".error-message").forEach((el) => {
-    el.textContent = "";
+          openForm(true, staffData);
+      });
   });
-}
+});

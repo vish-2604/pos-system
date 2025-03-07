@@ -5,7 +5,7 @@ admin.site.register(Table)
 
 # Register your models here.
 class BranchAdmin(admin.ModelAdmin):
-  list_display = ("id", "location", "area","manager_id","phone_no","status")
+  list_display = ("branch_id", "location", "area","manager_id","phone_no","is_active")
 admin.site.register(Branch, BranchAdmin)
 
 
@@ -34,6 +34,32 @@ class CustomerAdmin(admin.ModelAdmin):
     list_display=("customer_id","customer_firstname","customer_lastname","customer_email","customer_phone","gender")
 admin.site.register(Customer,CustomerAdmin)
 
+
+from django.contrib import admin # type: ignore 
+from django import forms # type: ignore 
+from django.contrib.auth.hashers import make_password # type: ignore 
+
+class StaffAdminForm(forms.ModelForm):
+    class Meta:
+        model = Staff
+        fields = '__all__'
+
+    def clean_staff_password(self):
+        password = self.cleaned_data.get("staff_password")
+
+        if self.instance and self.instance.pk:
+            existing_staff = Staff.objects.get(pk=self.instance.pk)
+            if existing_staff.staff_password == password:  
+                return password 
+        
+        if not password.startswith("pbkdf2_sha256$"):
+            return make_password(password)
+        return password
+
 class StaffAdmin(admin.ModelAdmin):
-    list_display=("staff_id","staff_username","staff_firstname","staff_lastname","staff_email","staff_phone","staff_role","branch")
-admin.site.register(Staff,StaffAdmin)
+    form = StaffAdminForm
+    list_display = [field.name for field in Staff._meta.fields] 
+
+admin.site.register(Staff, StaffAdmin)
+
+

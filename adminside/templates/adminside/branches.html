@@ -9,21 +9,13 @@
     <h3>BRANCHES</h3>
 
     <div class="search-container">
-      <input
-        type="text"
-        id="searchInput"
-        class="search-input"
-        placeholder="Search by store or manager"
-      />
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by location and area" />
       <button class="search-btn" onclick="toggleSearch()">
         <i class="fa fa-search"></i>
       </button>
     </div>
 
-    <button
-      class="open-button add-fooditems-button rounded-3"
-      onclick="openForm(false)"
-    >
+    <button class="open-button add-fooditems-button rounded-3" onclick="openForm(false)">
       <span class="btn-text">
         <i class="fa-solid fa-plus plus-icon"></i> Add Branch
       </span>
@@ -33,67 +25,76 @@
 
   <div class="overlay" id="overlay" onclick="closeForm()"></div>
   <div class="form-popup" id="myForm">
-    <form id="storeForm" class="form-container">
+    <form id="storeForm" class="form-container" method="POST">
+      {% csrf_token %}
+
       <h1 class="mb-3">Add Branch</h1>
 
+      <!-- Hidden input for updating existing branch -->
+      <input type="hidden" name="branch_id" id="branch_id">
+
+      <!-- Display non-field errors -->
+      {% for error in form.non_field_errors %}
+      <p style="color: red;">{{ error }}</p>
+      {% endfor %}
+
       <div class="form-group">
         <div class="input-group">
-          <label for="StoreLocation"><b>Location</b></label>
-          <input
-            type="text"
-            id="location"
-            placeholder="Enter location"
-            required
-          />
+          <label for="location"><b>Location</b></label>
+          <input type="text" name="location" id="location" placeholder="Enter location" required>
+          {% if form.location.errors %}
+          <p style="color: red;">{{ form.location.errors.0 }}</p>
+          {% endif %}
         </div>
+
         <div class="input-group">
           <label for="storeArea">Area</label>
-          <input
-            type="text"
-            name="Null"
-            id="storeArea"
-            placeholder="Enter area name"
-            required
-          />
+          <input type="text" name="area" id="storeArea" placeholder="Enter area name" required>
+          {% if form.area.errors %}
+          <p style="color: red;">{{ form.area.errors.0 }}</p>
+          {% endif %}
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
-          <label for="storeManager">Manager ID </label>
-          <input
-            type="text"
-            name="Null"
-            id="managerID"
-            placeholder="Manager name"
-            required
-          />
+          <label for="managerID">Manager ID</label>
+          <select name="manager_id" id="managerID">
+            <option value="" disabled selected>Select a manager</option>
+            {% for staff in staff_members %}
+              <option value="{{ staff.staff_id }}" {% if staff.staff_id == branch.manager.staff_id %}selected{% endif %}>
+                {{ staff.staff_fullname }}
+              </option>
+            {% endfor %}
+          </select>                   
         </div>
+        
 
         <div class="input-group">
-          <label for="StoreLocation"><b>Phone No.</b></label>
-          <input
-            type="tel"
-            id="PhoneNo"
-            placeholder="Enter Phone No."
-            required
-          />
+          <label for="PhoneNo"><b>Phone No.</b></label>
+          <input type="tel" name="phone_no" id="PhoneNo" placeholder="Enter Phone No." required>
+          {% if form.phone_no.errors %}
+          <p style="color: red;">{{ form.phone_no.errors.0 }}</p>
+          {% endif %}
         </div>
       </div>
+
       <div class="form-group">
         <div class="input-group">
-          <label for="storeManager">Status </label>
-          <select id="status">
-            <option value="">Status</option>
+          <label for="is_active"><b>Status</b></label>
+          <select id="is_active" name="is_active">
+            <option value="True">Active</option>
+            <option value="False">Inactive</option>
           </select>
+          {% if form.is_active.errors %}
+          <p style="color: red;">{{ form.is_active.errors.0 }}</p>
+          {% endif %}
         </div>
       </div>
 
       <div class="form-buttons">
         <button type="submit" class="btn">Add</button>
-        <button type="button" class="btn cancel" onclick="closeForm()">
-          Close
-        </button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
       </div>
     </form>
   </div>
@@ -105,13 +106,49 @@
           <th>ID</th>
           <th>Location</th>
           <th>Area</th>
-          <th>Manager ID</th>
+          <th>Manager</th>
           <th>Phone No.</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="storeTableBody"></tbody>
+      <tbody id="storeTableBody">
+        {% for branch in branches %}
+        <tr>
+          <td>{{ branch.branch_id }}</td>
+          <td>{{ branch.location }}</td>
+          <td>{{ branch.area }}</td>
+          <td>{{ branch.manager.staff_fullname|default:"No Manager" }}</td>
+          <td>{{ branch.phone_no }}</td>
+          <td>
+            {% if branch.is_active %}
+            <span style="color: green;">Active</span>
+            {% else %}
+            <span style="color: red;">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="update-btn"><i class="fas fa-edit"></i></button>
+
+              <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="delete_branch_id" value="{{ branch.branch_id }}">
+                <button type="submit" class="delete-btn"
+                    onclick="return confirm('Are you sure you want to delete this branch?');">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>            
+
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center">No branches found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
 </div>

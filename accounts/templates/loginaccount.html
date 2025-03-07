@@ -26,31 +26,40 @@
                 <form method="POST">
                     {% csrf_token %}
                     <div class="mt-4 mb-4">
-                        {{ form.username.label_tag }}
-                        {{ form.username }}
-                        {% if form.username.errors %}
+                        <label for="id_username_or_email">Username or Email</label>
+                        {{ form.username_or_email }}
+                        {% if form.errors.username_or_email %}
                         <div class="text-danger">
-                            {% for error in form.username.errors %}
+                            {% for error in form.errors.username_or_email %}
                             <p>{{ error }}</p>
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
+                
                     <div class="mb-3">
-                        {{ form.password.label_tag }}
+                        <label for="id_password">Password</label>
                         {{ form.password }}
-                        {% if form.password.errors %}
+                        {% if form.errors.password %}
                         <div class="text-danger">
-                            {% for error in form.password.errors %}
+                            {% for error in form.errors.password %}
                             <p>{{ error }}</p>
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
-
+                
+                    {% if messages %}
+                    <div class="text-danger">
+                        {% for message in messages %}
+                        <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                
                     <button type="submit" class="btn w-100 mt-2"
                         style="font-size: 18px; background-color: #4E598C;color: white; height: 50px;">Log in</button>
-                </form>
+                </form>                
             </div>
         </div>
     </div>

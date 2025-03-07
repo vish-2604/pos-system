@@ -9,21 +9,13 @@
     <h3>STAFF</h3>
 
     <div class="search-container">
-      <input
-        type="text"
-        id="searchInput"
-        class="search-input"
-        placeholder="Search by name"
-      />
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by name" />
       <button class="search-btn" onclick="toggleSearch()">
         <i class="fa fa-search"></i>
       </button>
     </div>
 
-    <button
-      class="open-button add-staff-button rounded-3"
-      onclick="openForm(false)"
-    >
+    <button class="open-button add-staff-button rounded-3" onclick="openForm(false)">
       <span class="btn-text">
         <i class="fa-solid fa-plus plus-icon"></i> Add Staff
       </span>
@@ -33,102 +25,165 @@
 
   <div class="overlay" id="overlay"></div>
   <div class="form-popup" id="myForm">
-    <form id="staffForm" class="form-container">
+    <form id="staffForm" class="form-container" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" id="staff_id" name="staff_id">
       <h1 class="mb-3">Add Staff</h1>
-
       <div class="form-group">
         <div class="input-group">
-          <label for="fullName"><b>FullName</b></label>
-          <input
-            type="text"
-            id="fullName"
-            placeholder="Enter Full Name"
-            required
-          />
+          <label for="staff_fullname"><b>Full Name</b></label>
+          <input type="text" id="staff_fullname" name="staff_fullname" placeholder="Enter Full Name" required />
         </div>
 
         <div class="input-group">
-          <label for="userName"><b>UserName</b></label>
-          <input
-            type="text"
-            id="userName"
-            placeholder="Enter User Name"
-            required
-          />
+          <label for="staff_username"><b>User Name</b></label>
+          <input type="text" id="staff_username" name="staff_username" placeholder="Enter User Name" required />
         </div>
       </div>
 
       <div class="input-group">
-        <label for="staffImage"><b>Image</b></label>
-        <input type="file" id="staffImage" accept="image/*" />
+        <label for="staff_img"><b>Image</b></label>
+        <input type="file" id="staff_img" name="staff_img" accept="image/*" />
       </div>
 
       <div class="input-group">
-        <label for="email"><b>E-mail</b></label>
-        <input type="email" id="email" placeholder="Enter email" required />
-      </div>
-
-      <div class="input-group">
-        <label for="password"><b>Password</b></label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Generate password"
-          required
-        />
+        <label for="staff_email"><b>E-mail</b></label>
+        <input type="email" id="staff_email" name="staff_email" placeholder="Enter email" required />
       </div>
 
       <div class="form-group">
         <div class="input-group">
-          <label for="staffRole"><b>StaffRole</b></label>
-          <select id="staffRole">
+          <label for="staff_password"><b>Password</b></label>
+          <input type="password" id="staff_password" name="staff_password" placeholder="Generate password" required />
+        </div>
+
+        <div class="input-group">
+          <label for="staff_role"><b>Staff Role</b></label>
+          <select id="staff_role" name="staff_role">
             <option value="" disabled selected hidden>Choose staff role</option>
             <option value="Manager">Manager</option>
             <option value="Waiter">Waiter</option>
             <option value="Chef">Chef</option>
           </select>
         </div>
+      </div>
+
+      <div class="form-group">
         <div class="input-group">
-          <label for="branches"><b>Branch</b></label>
-          <select id="branches">
+          <label for="staff_phone"><b>Phone No</b></label>
+          <input type="text" id="staff_phone" name="staff_phone" placeholder="Enter Phone Number" required />
+        </div>
+
+        <div class="input-group">
+          <label for="branch"><b>Branch</b></label>
+          <select id="branch" name="branch">
             <option value="" disabled selected hidden>Choose Branch</option>
-            <option value="Branch1">Branch1</option>
-            <option value="Branch2">Branch2</option>
-            <option value="Branch3">Branch3</option>
+            {% for branch in branches %}
+              <option value="{{ branch.branch_id }}">{{ branch.location }} - {{ branch.area }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="date_joined"><b>Joining Date</b></label>
+          <input type="date" id="date_joined" name="date_joined"
+            value="{{ date_joined|default_if_none:''|date:'Y-m-d' }}" />
+          <script>
+            document.addEventListener("DOMContentLoaded", function () {
+              var dateInput = document.getElementById("date_joined");
+
+              if (!dateInput.value) {
+                var today = new Date();
+                var yyyy = today.getFullYear();
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+                var dd = String(today.getDate()).padStart(2, '0');
+                var formattedDate = yyyy + '-' + mm + '-' + dd;
+
+                dateInput.value = formattedDate;
+              }
+            });
+
+          </script>
+        </div>
+
+        <div class="input-group">
+          <label for="is_active"><b>Status</b></label>
+          <select id="is_active" name="is_active">
+            <option value="True">Active</option>
+            <option value="False">Inactive</option>
           </select>
         </div>
       </div>
-
       <div class="form-buttons">
         <button type="submit" class="btn">Add</button>
-        <button type="button" class="btn cancel" onclick="closeForm()">
-          Close
-        </button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
       </div>
-      <span
-        id="defaultImagePath"
-        data-path="{% static 'images/default-profile.jpg'%}"
-        hidden
-      ></span>
     </form>
+
   </div>
 
   <div class="table-responsive">
     <table class="table staff-detail-table">
       <thead>
         <tr>
-          <th>Staff ID</th>
+          <th>ID</th>
           <th>Image</th>
-          <th>FullName</th>
-          <th>UserName</th>
-          <th>E-mail</th>
+          <th>Full Name</th>
+          <th>Username</th>
+          <th>Email</th>
           <th>Password</th>
-          <th>StaffRole</th>
+          <th>Role</th>
+          <th>Phone No</th>
           <th>Branch</th>
+          <th>Joining Date</th>
+          <th>Status</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="staffBody"></tbody>
+      <tbody id="staffBody">
+        {% for staff in staff_members %}
+        <tr>
+          <td>{{ staff.staff_id }}</td>
+          <td>
+            <img src="{{ staff.staff_img.url }}" alt="Staff Image" width="45" height="45" class="rounded-circle" />
+          </td>
+          <td>{{ staff.staff_fullname }}</td>
+          <td>{{ staff.staff_username }}</td>
+          <td>{{ staff.staff_email }}</td>
+          <td>******</td>
+          <td>{{ staff.staff_role }}</td>
+          <td>{{ staff.staff_phone }}</td>
+          <td>{{ staff.branch }}</td>
+          <td>{{ staff.date_joined }}</td>
+          <td>{% if staff.is_active %}
+            <span style="color: green;">Active</span>
+            {% else %}
+            <span style="color: red;">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="update-btn"><i class="fas fa-edit"></i></button>
+              
+              <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="delete_staff_id" value="{{ staff.staff_id }}">
+                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this staff member?');">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="10" class="text-center">No staff members found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
 </div>

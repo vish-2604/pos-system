@@ -77,6 +77,13 @@
   cursor: pointer;
 }
 
+.error-message {
+  display: block !important;
+  color: red !important;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 .action-buttons {
   display: flex;
   gap: 10px;
@@ -193,7 +200,7 @@
   box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
   z-index: 1001;
   display: none;
-  width: 500px;
+  width: 600px;
   max-height: 80vh;
   /* Set a max height */
   overflow-y: auto;

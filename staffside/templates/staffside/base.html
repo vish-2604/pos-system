@@ -60,7 +60,7 @@
             <li><a href="{% url 'staffside:settings' %}" class="nav-link {% if request.path == '/staffside/settings/' %}active{% endif %}">
                 <i class="fa fa-cogs"></i><span> Settings</span></a>
             </li>
-            <li><a href="{% url 'staffside:logout' %}" class="nav-link {% if request.path == '/staffside/logout/' %}active{% endif %}">
+            <li><a href="{% url 'accounts:logoutaccount' %}" class="nav-link {% if request.path == '/staffside/logout/' %}active{% endif %}">
                 <i class="fa fa-sign-out"></i><span> Logout</span></a>
             </li>
         </ul>
