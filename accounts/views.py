@@ -16,13 +16,15 @@ from rest_framework.permissions import AllowAny # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from adminside.models import Staff  # type: ignore
 from rest_framework.permissions import IsAuthenticated # type: ignore
+from django.contrib.auth.hashers import check_password  # type: ignore
 
 
-def send_confirmation_email(recipient, username="User"):
+
+def send_confirmation_email(user, username="User"):
     subject = "Confirmation Email"
     message = f"Hi {username},\n\nYou have successfully logged into POS system."
     from_email = settings.EMAIL_HOST_USER
-    recipient_list = [recipient]  
+    recipient_list = [user.staff_email]  
 
     try:
         send_mail(subject, message, from_email, recipient_list)
@@ -30,36 +32,40 @@ def send_confirmation_email(recipient, username="User"):
     except Exception as e:
         print("Failed to send verification email:", e)
 
-
-def logoutaccount(request):        
+def logoutaccount(request):
     logout(request)
-    return redirect('loginaccount') 
+    messages.success(request, "✅ Logout successful!")  
+    return redirect('accounts:loginaccount')
+
+def loginaccount(request): 
+    if request.method == "POST": 
+        print(messages) 
+        form = CustomLoginForm(request.POST)  
+        if not form.is_valid():  
+            print("❌ Form is not valid")  
+            print(form.errors)  # 🔹 Debugging errors  
+            messages.error(request, "Invalid form submission.")  
+            return render(request, "loginaccount.html", {"form": form})  
+
+        username_or_email = form.cleaned_data["username_or_email"]  # ✅ Fixed  
+        password = form.cleaned_data["password"]  
 
 
-def loginaccount(request):
-    if request.method == "POST":
-        form = CustomLoginForm(request.POST)
-        if form.is_valid():
-            staff = form.cleaned_data["staff"]
+        user = (Staff.objects.filter(staff_email=username_or_email).first() or  
+                Staff.objects.filter(username=username_or_email).first())  
 
-            # Authenticate the user using Django's default authentication
-            user = authenticate(request, username=staff.staff_username, password=form.cleaned_data['password'])
+        if user and check_password(password, user.password):
+            send_confirmation_email(user)  
+            login(request, user)  
+            request.session['login_date'] = timezone.now().strftime('%Y-%m-%d %H:%M:%S')  
+            if user.staff_role == "admin": 
+                return redirect("adminside:home")  
+            else:  
+                return redirect("staffside:pos")  
+        else: 
+            messages.error(request, "Invalid Username or Password.")  
+            return render(request, "loginaccount.html", {"form": form})  
 
-            if user is not None:
-                # Log the user in (this will handle the session automatically)
-                login(request, user)
-
-                # Set login date in session
-                request.session['login_date'] = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-
-                # Redirect based on the staff role
-                if user.staff_role == "admin":
-                    return redirect("adminside:home")
-                else:
-                    return redirect("staffside:pos")
-            else:
-                messages.error(request, "Invalid Username or Password.")
-    
-    form = CustomLoginForm()
-    return render(request, "loginaccount.html", {"form": form})
+    form = CustomLoginForm()  
+    return render(request, "loginaccount.html", {"form": form})  
 

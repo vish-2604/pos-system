@@ -149,4 +149,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'vishjshah19@gmail.com' 
 EMAIL_HOST_PASSWORD = 'pgdb zhpx qmzw fvvu'
 
-AUTH_USER_MODEL = 'adminside.Staff'
+
+AUTH_USER_MODEL = 'adminside.Staff' 

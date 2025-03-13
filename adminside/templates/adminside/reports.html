@@ -1,71 +1,54 @@
-{% load static %} {% block title %}
-<title>REPORT</title>
-{% endblock %} {% block css %}
-<link rel="stylesheet" href="{% static 'css/staff_style.css' %}" />
-<!-- Bootstrap CSS (Include in <head>) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Bootstrap JS (Include before </body>) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+{% load static %}
+{% block title %}
+<title>Sale & Reports</title>
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/reports_style.css' %}">
 {% endblock %}
 
-<div class="staff-page">
-  <div class="staff-title mt-4">
-    <h3>SALES REPORT</h3>
+<div class="food-items-page">
+  <div class="food-item-title mt-4">
+    <h3>SALES &   REPORTS</h3>
 
+    
     <div class="search-container">
-      <input
-        type="text"
-        id="searchInput"
-        class="search-input"
-        placeholder="Search by name"
-      />
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by category or name">
       <button class="search-btn" onclick="toggleSearch()">
         <i class="fa fa-search"></i>
       </button>
     </div>
-    </form>
   </div>
-  <div class="row">
-    <div class="da-box">
-            <select id="incomeDropdown" class="dropdown">
-                <option value="today">Today</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-            </select>    
-    </div>
-  </div>
-    <br>
 
-  <table class="table">
-    <thead>
+  <div class="table-responsive">
+    <table class="table fooditem-detail-table">
+      <thead>
         <tr>
-            <th>Product ID</th>
-            <th>Product Name</th>
-            <th>Category</th>
-            <th>Quantity</th>          
+          <th>ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Quantity Sold</th>
+          <th>Total Price</th>
+          <th>Sold Date</th>
         </tr>
-    </thead>
-    <tbody>
-        {% for i in data %}
+      </thead>
+      <tbody id="salesTableBody">
+        {% for item in sales_reports %}
         <tr>
-            <td>{{ i.product_id }}</td>
-            <td>{{ i.product_name }}</td>
-            <td>{{ i.calegories }}</td>
-            <td>{{ i.quentity }}</td>
-            
-
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.category.categories_name }}</td>
+          <td>{{ item.quantity_sold }}</td>
+          <td>{{ item.total_price }}</td>
+          <td>{{ item.sold_date }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="9">No is data available</td>
+          <td colspan="7" style="text-align: center;">No sales reports available</td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>    
+  </div>
 </div>
-<script src="{% static 'js/reports_scripts.js' %}"></script>
 
-
-    
+<script src="{% static 'js/fooditem_scripts.js' %}"></script>

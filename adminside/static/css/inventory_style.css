@@ -4,7 +4,8 @@
 
 :root {
     --color: #5e6790;
-  }
+}
+
 /* food item text search and add item button */
 .food-item-title {
     display: flex;
@@ -15,7 +16,7 @@
 }
 
 .add-fooditems-button {
-    background-color:#4E598C;
+    background-color: #4E598C;
     color: white;
     padding: 8px 12px;
     border: none;
@@ -80,17 +81,19 @@
 }
 
 
-.fooditem-detail-table th, 
+.fooditem-detail-table th,
 .fooditem-detail-table td {
-    padding: 15px 20px; /* Increase padding for more spacing */
+    padding: 15px 20px;
+    /* Increase padding for more spacing */
     text-align: left;
     text-wrap: nowrap;
-    
+
 }
 
 .fooditem-detail-table th {
     border-bottom: 2px solid #333 !important;
-    font-size: 18px; /* Increase font size if needed */
+    font-size: 18px;
+    /* Increase font size if needed */
 }
 
 .fooditem-detail-table td {
@@ -183,7 +186,8 @@
 }
 
 .input-group {
-    width: 48%; /* Each input takes half the width */
+    width: 48%;
+    /* Each input takes half the width */
     display: flex;
     flex-direction: column;
 }
@@ -276,12 +280,44 @@
 
     .update-btn,
     .delete-btn {
-        width: 100%;
         text-align: center;
     }
+
+    .form-popup {
+        width: 90%;
+        max-width: 400px;
+        padding: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .form-container {
+        width: 100%;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        /* Stack elements vertically */
+        gap: 10px;
+        /* Add spacing between fields */
+    }
+
+    .input-group {
+        width: 100%;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        width: 100%;
+        padding: 8px;
+    }
+
 }
 
 @media (max-width: 768px) {
+
     .food-item-title {
         flex-direction: row;
         justify-content: space-between;
@@ -313,15 +349,6 @@
         font-size: 14px;
     }
 
-    .form-group {
-        flex-direction: column; /* Stack input fields */
-        gap: 10px;
-    }
-
-    .input-group {
-        width: 100%; /* Inputs take full width */
-    }
-
     .search-input {
         display: none;
         width: 0;
@@ -333,4 +360,108 @@
         width: 180px;
     }
 
+    .form-popup {
+        width: 90%;
+        max-width: 400px;
+        padding: 20px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 10px; /* Smooth rounded corners */
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+        background: white;
+      }
+    
+      .form-container h1 {
+        font-size: 22px;
+        text-align: center;
+      }
+    
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    
+      .input-group {
+        width: 100%;
+      }
+    
+      .input-group input,
+      .input-group select,
+      .input-group textarea {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+      }
+    
+      .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+    
+      .form-buttons .btn {
+        width: 48%;
+        padding: 8px;
+        font-size: 14px;
+      }
+
 }
+
+.messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 300px; /* Adjust as needed */
+}
+
+.alert {
+    position: relative;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.alert-success {
+    background-color: #4E598C; /* Deep Blue */
+    color: white;
+}
+
+.alert-warning {
+    background-color: #FF8C42; /* Vibrant Orange */
+    color: white;
+}
+
+.alert-info {
+    background-color: #F9C784; /* Soft Yellow */
+    color: #4E598C; /* Deep Blue text */
+}
+
+.alert::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    animation: progressBar 3s linear forwards;
+}
+
+@keyframes progressBar {
+    0% { width: 100%; }
+    100% { width: 0; }
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+

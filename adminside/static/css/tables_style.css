@@ -85,28 +85,28 @@
 }
 
 .form-popup {
-  display: none; /* Hide form initially */
+  display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
 
 .overlay {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: none;
-  z-index: 1000;
+  z-index: 999;
 }
+
 
 .add-table-card {
   width: 200px;
@@ -310,3 +310,60 @@ p {
     right: 32%;
   }
 }
+
+.messages {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 300px; /* Adjust as needed */
+}
+
+.alert {
+  position: relative;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.alert-success {
+  background-color: #4E598C; /* Deep Blue */
+  color: white;
+}
+
+.alert-warning {
+  background-color: #FF8C42; /* Vibrant Orange */
+  color: white;
+}
+
+.alert-info {
+  background-color: #F9C784; /* Soft Yellow */
+  color: #4E598C; /* Deep Blue text */
+}
+
+.alert::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  animation: progressBar 3s linear forwards;
+}
+
+@keyframes progressBar {
+  0% { width: 100%; }
+  100% { width: 0; }
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+

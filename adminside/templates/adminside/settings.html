@@ -36,12 +36,24 @@
   <body>
     <div class="top-navbar">
       <div class="user-info">
-        <!-- <span>{{ request.user.username }}</span> -->
         <span class="notification"><i class="fa-solid fa-bell"></i></span>
-        <span>Date<br />Username</span>
-        <i class="fa fa-user"></i>
-      </div>
+        <span id="current-date">{{ user.username }}<br/></span>
+        <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image" 
+        class="staff-profile-img rounded-circle" 
+        style="width: 50px; height: 50px; object-fit: cover;margin-left: -3px;margin-bottom: 8px;">
+         </div>
     </div>
+    
+    <script>
+      // Get today's date in "Y-m-d" format
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading 0 if month is single digit
+      const day = String(today.getDate()).padStart(2, '0'); // Add leading 0 if day is single digit
+      const formattedDate = `${year}-${month}-${day}`;
+    
+      document.getElementById("current-date").innerHTML += formattedDate;
+    </script>
 
     <div class="sidebar" id="sidebar">
       <div class="pos-name">

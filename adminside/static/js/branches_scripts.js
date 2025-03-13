@@ -117,18 +117,19 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(document.getElementById("managerID").value)
   
     if (isUpdate) {
-      document.getElementById("branch_id").value = branchData.id || "";  // Set branch_id
+      document.getElementById("branch_id").value = branchData.id || ""; 
       document.getElementById("location").value = branchData.location || "";
       document.getElementById("storeArea").value = branchData.area || "";
-      
-
-      // Set the manager ID to the manager's ID, not the name
-      document.getElementById("managerID").value = branchData.manager_id || ""; // Set manager ID
+    
+      document.getElementById("managerID").value = branchData.manager_id || "";
       
       document.getElementById("PhoneNo").value = branchData.phone_no || "";
       document.getElementById("is_active").value = branchData.is_active ? "True" : "False";
-    } else {
-      document.getElementById("branch_id").value = ""; // Empty when adding a new branch
+      document.getElementById("submitBtn").textContent = "Update";
+    }
+    else {
+      document.getElementById("submitBtn").textContent = "Add";
+      document.getElementById("branch_id").value = "";
     }
   };
   
@@ -156,3 +157,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+  setTimeout(() => {
+      let alerts = document.querySelectorAll(".alert");
+      alerts.forEach(alert => {
+          alert.style.animation = "fadeOut 0.5s forwards";
+          setTimeout(() => alert.remove(), 500);
+      });
+  }, 3000);
+});

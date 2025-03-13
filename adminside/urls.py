@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path # type: ignore
 from . import views
 
 app_name = "adminside"
@@ -18,7 +18,7 @@ urlpatterns = [
     path('reports/', views.reports, name='reports'),
     path('settings/', views.adminside_settings_view, name='settings'),
     path('profile/', views.profile, name='profile'),
+    path("update-profile-pic/", views.update_profile_pic, name="update_profile_pic"),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('change_password/', views.change_password, name='change_password'),
-    path('logout/', views.logout_view, name='logout'),
 ]

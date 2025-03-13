@@ -26,12 +26,12 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
 
 function openForm() {
   document.getElementById("myForm").style.display = "block";
-  document.getElementById("overlay").style.display = "block"; 
+  document.getElementById("overlay").style.display = "block";
 }
 
 function closeForm() {
-  document.getElementById("myForm").style.display = "none"; 
-  document.getElementById("overlay").style.display = "none"; 
+  document.getElementById("myForm").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
 }
 
 document.querySelector(".add-staff-button").addEventListener("click", openForm);
@@ -46,10 +46,10 @@ function clearErrors() {
 
 function showError(inputId, message) {
   const inputElement = document.getElementById(inputId);
-  const inputGroup = inputElement.closest(".input-group"); 
-  
-  if (!inputGroup) return; 
-  
+  const inputGroup = inputElement.closest(".input-group");
+
+  if (!inputGroup) return;
+
   let existingError = inputGroup.querySelector(".error-message");
   if (existingError) {
     existingError.textContent = message;
@@ -60,18 +60,18 @@ function showError(inputId, message) {
   errorElement.style.color = "red";
   errorElement.style.fontSize = "12px";
   errorElement.textContent = message;
-  
-  inputGroup.appendChild(errorElement); 
+
+  inputGroup.appendChild(errorElement);
 }
 
 function isValidEmail(email) {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailPattern.test(email);
 }
 
 function validateForm(event) {
-  event.preventDefault(); 
-  clearErrors(); 
+  event.preventDefault();
+  clearErrors();
 
   let isValid = true;
 
@@ -84,85 +84,127 @@ function validateForm(event) {
   const branch = document.getElementById("branch").value;
 
   if (email === "" || !isValidEmail(email)) {
-      showError("staff_email", "Enter a valid email address");
-      isValid = false;
+    showError("staff_email", "Enter a valid email address");
+    isValid = false;
   }
 
   const phonePattern = /^[6789]\d{9}$/;
   if (phone === "" || !phonePattern.test(phone)) {
-      showError("staff_phone", "Phone must start with 6,7,8,9 & be 10 digits");
-      isValid = false;
+    showError("staff_phone", "Phone must start with 6,7,8,9 & be 10 digits");
+    isValid = false;
   }
 
   const passwordPattern = /^(?=.*[A-Z])(?=.*[\W]).{6,}$/;
   if (password === "" || !passwordPattern.test(password)) {
-      showError("staff_password", "Password must be 6+ chars, 1 uppercase, 1 special character");
-      isValid = false;
+    showError("staff_password", "Password must be 6+ chars, 1 uppercase, 1 special character");
+    isValid = false;
   }
   if (fullname === "") {
-      showError("staff_fullname", "Full name is required");
-      isValid = false;
+    showError("staff_fullname", "Full name is required");
+    isValid = false;
   }
   if (username === "") {
-      showError("staff_username", "Username is required");
-      isValid = false;
+    showError("staff_username", "Username is required");
+    isValid = false;
   }
   if (!role) {
-      showError("staff_role", "Select a staff role");
-      isValid = false;
+    showError("staff_role", "Select a staff role");
+    isValid = false;
   }
   if (!branch) {
-      showError("branch", "Select a branch");
-      isValid = false;
+    showError("branch", "Select a branch");
+    isValid = false;
   }
   if (isValid) {
-      document.getElementById("staffForm").submit(); 
+    document.getElementById("staffForm").submit();
   }
 }
 
 
 document.addEventListener("DOMContentLoaded", function () {
   window.openForm = function (isUpdate, staffData = {}) {
-      document.getElementById("myForm").style.display = "block";
-      document.getElementById("overlay").style.display = "block";
+    document.getElementById("myForm").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
 
-      document.getElementById("staffForm").reset();
+    document.getElementById("staffForm").reset();
 
-      if (isUpdate) {
-          document.getElementById("staff_id").value = staffData.staff_id;
-          document.getElementById("staff_fullname").value = staffData.staff_fullname;
-          document.getElementById("staff_username").value = staffData.staff_username;
-          document.getElementById("staff_email").value = staffData.staff_email;
-          document.getElementById("staff_password").value = "******"; 
-          document.getElementById("staff_role").value = staffData.staff_role;
-          document.getElementById("staff_phone").value = staffData.staff_phone;
-          document.getElementById("branch").value = staffData.branch;
-          document.getElementById("date_joined").value = staffData.date_joined;
-          document.getElementById("is_active").value = staffData.is_active ? "True" : "False";
-      }
-  };
+    if (isUpdate) {
+        document.getElementById("staff_id").value = staffData.staff_id;
+        document.getElementById("staff_fullname").value = staffData.staff_fullname;
+        document.getElementById("staff_username").value = staffData.username;
+        document.getElementById("staff_email").value = staffData.staff_email;
+        document.getElementById("staff_password").value = "******";
+        document.getElementById("staff_phone").value = staffData.staff_phone;
+        document.getElementById("date_joined").value = staffData.date_joined;
+        document.getElementById("is_active").value = staffData.is_active ? "True" : "False";
+
+        // Ensure the role is selected correctly
+        let roleDropdown = document.getElementById("staff_role");
+        if (staffData.staff_role) {
+            roleDropdown.value = staffData.staff_role;
+        } else {
+            roleDropdown.selectedIndex = 0; // Default placeholder
+        }
+
+        let branchDropdown = document.getElementById("branch");
+
+        if (staffData.branch) {
+            let selectedBranch = staffData.branch.trim().toLowerCase();
+            let matchFound = false;
+        
+            Array.from(branchDropdown.options).forEach(option => {
+                if (option.value.trim().toLowerCase() === selectedBranch) {
+                    branchDropdown.value = option.value;
+                    matchFound = true;
+                }
+            });
+        
+            if (!matchFound) {
+                branchDropdown.selectedIndex = 0; 
+            }
+        } else {
+            branchDropdown.selectedIndex = 0;
+        }
+        document.getElementById("submitBtn").textContent = "Update";
+    } else {
+        document.getElementById("submitBtn").textContent = "Add";
+    }
+};
+
+
 
   window.closeForm = function () {
-      document.getElementById("myForm").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
+    document.getElementById("myForm").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
   };
 
   document.querySelectorAll(".update-btn").forEach(button => {
-      button.addEventListener("click", function () {
-          let row = this.closest("tr");
-          let staffData = {
-              staff_id: row.children[0].textContent.trim(),
-              staff_fullname: row.children[2].textContent.trim(),
-              staff_username: row.children[3].textContent.trim(),
-              staff_email: row.children[4].textContent.trim(),
-              staff_role: row.children[6].textContent.trim(),
-              staff_phone: row.children[7].textContent.trim(),
-              branch: row.children[8].textContent.trim(),
-              date_joined: row.children[9].textContent.trim(),
-              is_active:row.children[10].textContent.trim() === "Active"
-          };
+    button.addEventListener("click", function () {
+      let row = this.closest("tr");
+      let staffData = {
+        staff_id: row.children[0].textContent.trim(),
+        staff_fullname: row.children[2].textContent.trim(),
+        username: row.children[3].textContent.trim(),
+        staff_email: row.children[4].textContent.trim(),
+        staff_role: row.children[6].textContent.trim(),
+        staff_phone: row.children[7].textContent.trim(),
+        branch: row.children[8].textContent.trim(),
+        date_joined: row.children[9].textContent.trim(),
+        is_active: row.children[10].textContent.trim() === "Active"
+      };
 
-          openForm(true, staffData);
-      });
+      openForm(true, staffData);
+    });
   });
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+  setTimeout(() => {
+      let alerts = document.querySelectorAll(".alert");
+      alerts.forEach(alert => {
+          alert.style.animation = "fadeOut 0.5s forwards";
+          setTimeout(() => alert.remove(), 500);
+      });
+  }, 3000);
+});
+

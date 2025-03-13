@@ -1,4 +1,5 @@
-{% load static %} {% block title %}
+{% load static %} 
+{% block title %}
 <title>Staff</title>
 {% endblock %} {% block css %}
 <link rel="stylesheet" href="{% static 'css/staff_style.css' %}" />
@@ -7,6 +8,15 @@
 <div class="staff-page">
   <div class="staff-title mt-4">
     <h3>STAFF</h3>
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
 
     <div class="search-container">
       <input type="text" id="searchInput" class="search-input" placeholder="Search by name" />
@@ -14,7 +24,6 @@
         <i class="fa fa-search"></i>
       </button>
     </div>
-
     <button class="open-button add-staff-button rounded-3" onclick="openForm(false)">
       <span class="btn-text">
         <i class="fa-solid fa-plus plus-icon"></i> Add Staff
@@ -60,7 +69,7 @@
         <div class="input-group">
           <label for="staff_role"><b>Staff Role</b></label>
           <select id="staff_role" name="staff_role">
-            <option value="" disabled selected hidden>Choose staff role</option>
+            <option value="" disabled selected>Choose role</option>
             <option value="Manager">Manager</option>
             <option value="Waiter">Waiter</option>
             <option value="Chef">Chef</option>
@@ -77,9 +86,11 @@
         <div class="input-group">
           <label for="branch"><b>Branch</b></label>
           <select id="branch" name="branch">
-            <option value="" disabled selected hidden>Choose Branch</option>
+            <option value="" disabled selected>Choose Branch</option>
             {% for branch in branches %}
+            {% if branch.is_active %}
               <option value="{{ branch.branch_id }}">{{ branch.location }} - {{ branch.area }}</option>
+              {% endif %}
             {% endfor %}
           </select>
         </div>
@@ -118,7 +129,7 @@
         </div>
       </div>
       <div class="form-buttons">
-        <button type="submit" class="btn">Add</button>
+        <button type="submit" class="btn"  id="submitBtn">Add</button>
         <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
       </div>
     </form>
@@ -151,7 +162,7 @@
             <img src="{{ staff.staff_img.url }}" alt="Staff Image" width="45" height="45" class="rounded-circle" />
           </td>
           <td>{{ staff.staff_fullname }}</td>
-          <td>{{ staff.staff_username }}</td>
+          <td>{{ staff.username }}</td>
           <td>{{ staff.staff_email }}</td>
           <td>******</td>
           <td>{{ staff.staff_role }}</td>
