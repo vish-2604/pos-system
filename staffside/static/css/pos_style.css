@@ -1,15 +1,69 @@
-*{
+* {
     font-family: "Nunito", sans-serif;
 }
 
-.category-link{
-  text-decoration: none; 
-  color: black; 
-  font-size: 18px;
-  font-weight: normalx;
+/* Wrapper for category section */
+.category-wrapper {
+    overflow-x: auto;
+    /* Enable horizontal scroll */
+    white-space: nowrap;
+    padding-bottom: 10px;
+    /* Space for scrollbar */
 }
 
-.category-link.active{
+/* Make categories flex for horizontal alignment */
+.category-container {
+    display: flex;
+    flex-wrap: nowrap;
+    /* Prevent wrapping */
+    gap: 10px;
+    /* Space between categories */
+}
+
+/* Style category items */
+.category-col {
+    flex: 0 0 auto;
+    /* Prevent resizing */
+    padding: 10px;
+}
+
+/* Hide scrollbar in Firefox */
+.category-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+/* Scrollbar styling for Chrome, Edge, and Safari */
+.category-wrapper::-webkit-scrollbar {
+    height: 6px;
+    /* Thin scrollbar */
+}
+
+.category-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Light track */
+    border-radius: 10px;
+}
+
+.category-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Darker scroll handle */
+    border-radius: 10px;
+}
+
+.category-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+.category-link {
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    font-weight: normalx;
+}
+
+.category-link.active {
     color: #4E598C;
     font-weight: bold;
     border-bottom: 2px solid #4E598C;
@@ -22,12 +76,12 @@
     border: none;
 }
 
-.add-to-cart-button{
+.add-to-cart-button {
     background-color: #4E598C;
     color: white;
 }
 
-.cart-container, .left-section {
+.cart-container {
     min-height: 100vh;
 }
 
@@ -46,7 +100,7 @@
     margin-bottom: 15px;
 }
 
-#table-selector{
+#table-selector {
     margin-top: -12px;
 }
 
@@ -92,7 +146,7 @@
 
 .cart-item-controls {
     margin-top: -10px;
-    gap:5px;
+    gap: 5px;
     display: flex;
     align-items: center;
 }
@@ -126,7 +180,7 @@
     color: black;
 }
 
-.payment-btn{
+.payment-btn {
     margin-top: 10px;
     background-color: #4E598C;
     color: white;
@@ -140,26 +194,6 @@
     color: black;
 }
 
-
-
-.quantity-container {
-    display: flex;
-    align-items: center;
-    /* Ensures vertical alignment */
-    justify-content: flex-start;
-    gap: 10px;
-    /* Add space between buttons and quantity text */
-}
-
-/* Quantity label styling */
-.quantity-label {
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 10px;
-    /* Space between the label and the buttons */
-}
-
-/* Make the buttons smaller and centered */
 .btn-light {
     width: 20px;
     height: 20px;
@@ -175,150 +209,319 @@
     /* Ensures that the text inside the button is centered */
 }
 
-/* Align text in the center of buttons */
-.quantity-text {
-    font-size: 18px;
-    /* Slightly larger font for better alignment */
-    font-weight: bold;
-    display: inline-block;
-    /* Keeps the quantity text inline with buttons */
-    text-align: center;
-    line-height: 30px;
-    /* Aligns text vertically with the button */
+.card-img-left {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
-/* Adjust for smaller screens */
 @media (max-width: 576px) {
     .btn-light {
         width: 25px;
         height: 25px;
         font-size: 14px;
     }
-
-    .quantity-text {
-        font-size: 14px;
-        /* Adjust the quantity text size on smaller screens */
-        line-height: 25px;
-        /* Align text vertically with smaller buttons */
-    }
 }
 
 
-@media (max-width: 1206px) and (min-width:992px){
+
+
+@media (max-width: 1238px) and (min-width:1044px) {
     .left-section {
         width: 100%;
+    }
+
+    .right-section {
+        text-align: center;
+        margin-left: 10px;
+        justify-content: center;
     }
 
     .cart-container {
         width: 100%;
         margin-top: 20px;
     }
+}
 
-    .category-link {
-        font-size: 14px;
-        padding: 8px;
+@media (max-width: 1202px) and (min-width:1044px) {
+    .large-btn {
+        margin-top: 4px;
+    }
+}
+
+
+@media (max-width: 1044px) and (min-width:992px) {
+    .left-section {
+        width: 100%;
     }
 
-    .card {
-        flex-direction: column;
+    .right-section {
         text-align: center;
+        justify-content: center;
+        margin-left: 20px;
     }
 
-    .card img {
-        width: 80px;
-        height: 80px;
-    }
-
-    .cart-item {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .cart-item-img {
-        width: 50px;
-        height: 50px;
-    }
-}
-
-
-@media (max-width: 1058px) and (min-width: 993px){
-    .large-btn{
-        margin-top: 5px;
-    }
-}
-
-@media (max-width: 993px) and (min-width: 944px) {
-    .left-section {
-        width: 100%;
-    }
-
-  .cart-container {
-        width: 100%;
-        margin-top: 20px;
-    } 
-
-    .category-link {
-        font-size: 14px;
-        padding: 2px;
-    }
-
-    .large-btn{
-        margin-top: 3px;
-    }
-}
-
-@media (max-width: 944px) and (min-width: 810px) {
-    .left-section {
-        width: 100%;
-    }
-
-  .cart-container {
-        width: 100%;
-        margin-top: 20px;
-    } 
-
-    .category-link {
-        font-size: 14px;
-        padding: 2px;
-    }
-
-    .medium-btn{
-        margin-top: 3px;
-    }
-
-    .large-btn{
-        margin-top: 3px;
-    }
-}
-
-@media (max-width: 810px) and (min-width: 768px) {
-    .left-section {
-        width: 100%;
-    }
+      .card-img-left{
+        height: 130px;
+        width:  130px;
+      }
 
     .cart-container {
         width: 100%;
         margin-top: 20px;
     }
-
 }
 
-@media (max-width: 484px) and (min-width:424px){
-    .large-btn{
-        margin-top: 5px;
+@media (max-width: 968px) and (min-width:862px) {
 
+      .card-img-left{
+        height: 110px !important;
+        width:  110px !important;
+      }
+}
+
+@media (max-width: 1044px) and (min-width:992px) {
+    .large-btn {
+        margin-top: 4px;
+    }
+
+    .medium-btn {
+        margin-top: 4px;
     }
 }
 
-@media (max-width: 424px){
+@media (max-width: 862px) and (min-width:814px) {
 
+    .card-img-left{
+      height: 100px !important;
+      width:  100px !important;
+    }
+}
+
+@media (max-width:814px) and (min-width:768px) {
+
+    .card-img-left{
+      height: 90px !important;
+      width:  90px !important;
+    }
+}
+
+@media (max-width: 992px) and (min-width:768px) {
+    .left-section {
+        width: 100%;
+    }
+
+    .right-section {
+        text-align: center;
+        justify-content: center;
+        margin-left: 20px;
+    }
+    .card-img-left{
+        height: 130px;
+        width:  130px;
+      }
+
+    .cart-container {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 992px) and (min-width: 768px){
     .medium-btn{
-        margin-top: 5px;
-
+        margin-top:4px;
     }
     .large-btn{
-        margin-top: 5px;
+        margin-top:4px;
+    }
+}
 
+@media (max-width: 513px){
+    .right-section {
+        text-align: center;
+        justify-content: center;
+        margin-left: 20px;
+    }
+}
+
+@media (max-width: 547px) and (min-width: 478px){
+    .large-btn{
+        margin-top:4px;
+    }
+}
+
+@media (max-width: 478px){
+    .medium-btn{
+        margin-top:4px;
+    }
+    .large-btn{
+        margin-top:4px;
+    }
+    .card-img-left{
+        height: 130px;
+        width:  130px;
+      }
+}
+
+@media (max-width: 442px){
+    .card-img-left{
+        height: 110px;
+        width:  110px;
+      }
+}
+
+@media (max-width: 384px){
+    .card-img-left{
+        height: 90px !important;
+        width:  90px !important;
+      }
+}
+
+@media (max-width: 325px){
+    .card-img-left{
+        height: 80px !important;
+        width:  80px !important;
+      }
+}
+
+.messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 300px;
+    /* Adjust as needed */
+}
+
+.alert {
+    position: relative;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    overflow: hidden;
+}
+
+.alert-success {
+    background-color: #4E598C;
+    /* Deep Blue */
+    color: white;
+}
+
+.alert-error {
+    background-color: #FF8C42 !important;
+    background: #FF8C42 !important;
+    color: white !important;
+}
+
+.alert::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    animation: progressBar 3s linear forwards;
+}
+
+@keyframes progressBar {
+    0% {
+        width: 100%;
+    }
+
+    100% {
+        width: 0;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.size-btn {
+    background-color: #f0f0f0;
+    /* Default background */
+    color: black;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.size-btn.selected {
+    background-color: #4E598C !important;
+    /* Deep Blue */
+    color: white !important;
+    border-color: #4E598C;
+}
+
+.toast-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    height: 50px;
+    width: 250px;
+    background: #FF8C42;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards, fadeOut 0.5s 2.5s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.toast-progress {
+    height: 3px;
+    width: 100%;
+    background: #fffefe;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    animation: progressBar 3s linear forwards;
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0;
     }
 }

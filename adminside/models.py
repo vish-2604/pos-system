@@ -39,7 +39,7 @@ class Table(models.Model):
                 cart_id SERIAL PRIMARY KEY,
                 table_id INTEGER REFERENCES adminside_table(table_id) ON DELETE CASCADE,
                 order_item TEXT NOT NULL,
-                size INTEGER DEFAULT 0,
+                size TEXT CHECK (size IN ('small', 'medium', 'large')) DEFAULT 'medium',
                 quantity INTEGER DEFAULT 0,
                 price DECIMAL(10,2) DEFAULT 0.00
             )

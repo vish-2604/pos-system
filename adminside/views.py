@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404  # type: ignore
 from .forms import CustomPasswordChangeForm
-from adminside.models import Table
 from django.db import connection # type: ignore
 from .models import Staff,Branch,Supplier,Purchase,Categories,Inventory,FoodItem,Table,Customer,Sales_reports
 from .forms import StaffForm,BranchForm,SupplierForm,PurchaseForm,CategoryForm,InventoryForm,CustomerForm
@@ -48,7 +47,7 @@ def staff(request):
             staff_id = request.POST.get('delete_staff_id')
             staff = get_object_or_404(Staff, staff_id=staff_id)
             staff.delete()
-            messages.error(request, f'Staff member "{staff.staff_name}" deleted successfully.')
+            messages.success(request, f'Staff member "{staff.staff_name}" deleted successfully.')
             return redirect('adminside:staff')
 
         staff_id = request.POST.get('staff_id')
@@ -90,7 +89,7 @@ def branches(request):
             if branch_id:
                 branch = get_object_or_404(Branch, branch_id=branch_id)
                 branch.delete()
-                messages.error(request, f'Branch "{branch.location}" deleted successfully.')
+                messages.success(request, f'Branch "{branch.location}" deleted successfully.')
                 return redirect('adminside:branches')
 
         branch_id = request.POST.get('branch_id')
@@ -134,7 +133,7 @@ def suppliers(request):
             supplier_id = request.POST.get('delete_supplier_id')
             supplier = get_object_or_404(Supplier, supplier_id=supplier_id)
             supplier.delete()
-            messages.error(request, f'Supplier "{supplier.supplier_name}" deleted successfully.')
+            messages.success(request, f'Supplier "{supplier.supplier_name}" deleted successfully.')
             return redirect('adminside:suppliers')
 
         supplier_id = request.POST.get('supplier_id')
@@ -224,7 +223,7 @@ def categories(request):
             category_id = request.POST.get('delete_category_id')
             category = get_object_or_404(Categories, categories_id=category_id)
             category.delete()
-            messages.error(request, f'Category "{category.categories_name}" deleted.')
+            messages.success(request, f'Category "{category.categories_name}" deleted.')
             return redirect('adminside:categories')
 
         category_id = request.POST.get('category_id')
@@ -258,7 +257,7 @@ def inventory(request):
             item_id = request.POST.get("delete_inventory_id")
             item = get_object_or_404(Inventory, id=item_id)
             item.delete()
-            messages.error(request, f'Inventory item "{item.purchase.food_item}" deleted successfully.')
+            messages.success(request, f'Inventory item "{item.purchase.food_item}" deleted successfully.')
             return redirect("adminside:inventory")
 
         item_id = request.POST.get("inventory_id")  
@@ -308,7 +307,7 @@ def customer(request):
             customer_id = request.POST.get('delete_customer_id')
             customer = get_object_or_404(Customer, customer_id=customer_id)
             customer.delete()
-            messages.error(request, f'Customer "{customer.customer_name}" deleted successfully.')
+            messages.success(request, f'Customer "{customer.customer_firstname}" deleted successfully.')
             return redirect('adminside:customer')  
 
         customer_id = request.POST.get('customer_id')
@@ -317,7 +316,7 @@ def customer(request):
         if customer_id:
             customer = get_object_or_404(Customer, customer_id=customer_id)
             form = CustomerForm(form_data, instance=customer)
-            msg = f'Customer "{customer.customer_name}" updated successfully.'
+            msg = f'Customer "{customer.customer_firstname}" updated successfully.'
         else:
             form = CustomerForm(form_data)
             msg = "New customer added successfully."

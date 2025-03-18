@@ -4,25 +4,131 @@
 <link rel="stylesheet" href="{% static 'css/pos_style.css' %}">
 {% endblock %}
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 <div class="container-fluid" style="font-family: Nunito, serif; font-weight: 800">
     <div class="row">
         <div class="col-md-9 left-section">
-            <div class="row" id="category-container"></div>
-            <div class="row mt-3" id="product-container"></div>
+            <div class="category-wrapper">
+                <div class="category-container d-flex">
+                    <div class="category-col text-center">
+                        <a href="?category=all"
+                            class="category-link {% if selected_category == 'all' %}active{% endif %}">
+                            All
+                        </a>
+                    </div>
+                    {% for category in categories %}
+                    <div class="category-col text-center">
+                        <a href="?category={{ category.categories_id }}"
+                            class="category-link {% if selected_category == category.categories_id %}active{% endif %}">
+                            {{ category.categories_name }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row mt-3" id="product-container">
+                {% for item in food_items %}
+                <div class="col-md-6 mb-4 d-flex justify-content-center product-item">
+                    <div class="card d-flex flex-row align-items-center p-3" style="width: 100%; display: flex;">
+
+                        <!-- Left Section: Image + Add to Cart -->
+                        <div class="left-section d-flex flex-column align-items-center" style="width: 40%;">
+                            <img src="{{ item.image.url }}" class="card-img-left">
+
+                            <!-- Hidden Form for Add to Cart -->
+                            <form method="POST"
+                                action="{% url 'staffside:add_to_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="table_id" id="selected_table_id"
+                                    value="{{ selected_table }}">
+                                <input type="hidden" name="food_item" value="{{ item.name }}">
+                                <input type="hidden" name="price" value="{{ item.price }}"
+                                    data-base-price="{{ item.price }}">
+                                <input type="hidden" name="size" class="selected-size" value="medium">
+                                <input type="hidden" name="quantity" class="selected-quantity" value="1">
+
+                                <button type="submit" class="btn add-to-cart-button mt-3"
+                                    style="background-color: #4E598C; color: white; width: 100%;">
+                                    Add to Cart
+                                </button>
+                            </form>
+
+                        </div>
+                        <!-- Right Section: Details -->
+                        <div class="right-section card-body d-flex flex-column" style="width: 60%; padding-left: 15px;">
+
+                            <!-- Item Name with Special Star -->
+                            <h4 class="card-title">
+                                {% if item.is_special %}
+                                <span style="color: gold; font-size: 16px; margin-right: 5px;">⭐</span>
+                                {% endif %}
+                                {{ item.name }}
+                            </h4>
+
+                            <p style="font-weight: normal; font-size: 13px;">{{ item.description }}</p>
+
+                            <!-- Price List -->
+                            <p class="card-text"
+                                style="font-size: 12px; display: flex; justify-content: space-between;">
+                                <span>Small</span> <span>₹{{ item.price|add:"-100" }}</span>
+                            </p>
+                            <p class="card-text"
+                                style="font-size: 12px; display: flex; justify-content: space-between;">
+                                <span>Medium</span> <span>₹{{ item.price }}</span>
+                            </p>
+                            <p class="card-text"
+                                style="font-size: 12px; display: flex; justify-content: space-between;">
+                                <span>Large</span> <span>₹{{ item.price|add:"100" }}</span>
+                            </p>
+
+                            <!-- Size Selection -->
+                            <div class="size-options mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary size-btn small-btn"
+                                    data-size="small">Small</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary size-btn medium-btn"
+                                    data-size="medium">Medium</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary size-btn large-btn"
+                                    data-size="large">Large</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+
         </div>
         <div class="col-md-3 cart-container p-4">
             <div class="cart-header d-flex justify-content-between align-items-center">
                 <h3 class="cart-title">Cart</h3>
-                <select id="table-selector" class="form-select w-50">
-                    <option value="" selected disabled>Select Table</option>
-                    <option value="1">Table 1</option>
-                    <option value="2">Table 2</option>
-                    <option value="3">Table 3</option>
-                    <option value="4">Table 4</option>
-                    <option value="5">Table 5</option>
+                <select id="table-selector" class="form-select w-50" onchange="reloadWithTable(this)">
+                    <option value="" disabled {% if not selected_table %}selected{% endif %}>Choose table</option>
+                    {% for table in tables %}
+                    <option value="{{ table.table_id }}" {% if table.table_id|stringformat:'s' == selected_table|stringformat:'s' %} selected {% endif %}>
+                        Table-{{ table.table_id }}
+                    </option>
+                    {% endfor %}
                 </select>
+
+                <form method="POST" action="{% url 'staffside:add_to_cart' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="table_id" class="selected-table-id" value="{{ selected_table }}">
+                </form>
             </div>
-            
+
             <div class="order-options d-flex justify-content-between">
                 <button class="btn btn-light">Delivery</button>
                 <button class="btn btn-light">Dine In</button>
@@ -30,7 +136,61 @@
             </div>
             <hr>
             <div id="cart-container" class="cart-items">
+                {% if cart_items %}
+                {% for item in cart_items %}
+                <div class="cart-item d-flex align-items-center justify-content-between p-2 border"
+                    data-unit-price="{{ item.price|floatformat:2 }}" data-item-id="{{ item.cart_id }}"
+                    data-size="{{ item.size }}">
+                    <div class="cart-details">
+                        <p class="mb-0"><strong>{{ item.order_item }}</strong></p>
+                        <p class="mb-0">Size: {{ item.size }}</p>
+                        <p class="mb-0">₹<span class="price-value">{{ item.price|floatformat:2 }}</span></p>
+                    </div>
+                    <div class="cart-quantity d-flex">
+                        <form method="POST" action="{% url 'staffside:update_cart' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="table_id" value="{{ selected_table }}">
+                            <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
+                            <input type="hidden" name="action" value="decrease">
+                            <input type="hidden" name="category" value="{{ selected_category }}">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                        </form>
+
+                        <span class="mx-2 quantity-value">{{ item.quantity }}</span>
+
+                        <form method="POST" action="{% url 'staffside:update_cart' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="table_id" value="{{ selected_table }}">
+                            <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
+                            <input type="hidden" name="action" value="increase">
+                            <input type="hidden" name="category" value="{{ selected_category }}">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
+                        </form>
+                    </div>
+
+                    <form method="POST"
+                        action="{% url 'staffside:update_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="table_id" value="{{ selected_table }}">
+                        <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
+                        <input type="hidden" name="quantity" class="quantity-input" value="{{ item.quantity }}">
+                    </form>
+                    
+                    <!-- Remove button -->
+                    <form method="POST"
+                        action="{% url 'staffside:remove_from_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="table_id" value="{{ selected_table }}">
+                        <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
+                        <button type="submit" class="btn btn-sm" style="font-size: 20px;"><i class="fa-solid fa-xmark"></i></button>
+                    </form>
+
+
+                </div>
+                {% endfor %}
+                {% else %}
                 <p class="text-center">Cart is empty</p>
+                {% endif %}
             </div>
             <hr>
             <div class="cart-summary">
@@ -38,10 +198,18 @@
                 <p><strong>Discounts:</strong> <span id="cart-discount">₹0.00</span></p>
                 <p class="total-price"><strong>Total:</strong> <span id="cart-total-price">₹0.00</span></p>
             </div>
-            <button class="btn btn-primary w-100 place-order-btn">Place an order</button>
-            <button class="btn btn-primary w-100 payment-btn">Payment</button>
+            <form method="POST" action="{% url 'staffside:place_order' %}">
+                {% csrf_token %}
+                <input type="hidden" name="table_id" class="selected-table-id" value="{{ selected_table }}">
+                <button type="submit" class="btn btn-primary w-100 place-order-btn">Place an order</button>
+            </form>
+            <form method="POST" action="{% url 'staffside:process_payment' %}">
+                {% csrf_token %}
+                <input type="hidden" name="table_id" class="selected-table-id" value="{{ selected_table }}">
+                <button type="submit" class="btn btn-primary w-100 payment-btn">Payment</button>
+            </form>
+            
         </div>
-
     </div>
 </div>
 

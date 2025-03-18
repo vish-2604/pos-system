@@ -1,0 +1,48 @@
+{% load static %}
+{% load custom_filters %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/order_style.css' %}">
+{% endblock %}
+
+<div class="print-receipt">
+    <h2>Coffee Shop</h2>
+    <p>Location: {{ sale.order.branch.location }}<br>Tel.: {{ sale.order.branch.phone_no }}</p>
+    <hr>
+    <p><strong>Store:</strong> {{ sale.order.branch.branch_id }} &nbsp;&nbsp;&nbsp; {{ sale.order.created_at|date:"d-m-Y H:i A" }}</p>
+    <p><strong>Server:</strong> {{ sale.order.staff.staff_role }}</p>
+    <p><strong>Survey code:</strong> 0000-2555-2588-4545-69</p>
+    <hr>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Qty</th>
+                <th class="text-end">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, item in sale.order.ordered_items.items %}
+            <tr style="font-size: 13px;">
+              <td>{{ key|extract_name }}</td>  <!-- Item name with size -->
+                <td class="text-end">{{ item.quantity }}</td>
+                <td class="text-end">₹{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+    <div class="text-end">
+        <p><strong>Price:</strong> ₹{{ sale.order.total_price }}</p>
+        <p><strong>Cash:</strong> ₹{{ cash_given }}</p>
+        <p><strong>Change:</strong> ₹{{ change|floatformat:2 }}</p>
+    </div>
+    <hr>
+    <p class="text-center">THANK YOU!</p>
+
+    <!-- Barcode -->
+    <div class="barcode text-center">
+        <img src="{{ barcode_url }}" alt="Barcode">
+    </div>
+</div>

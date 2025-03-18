@@ -61,7 +61,7 @@ def loginaccount(request):
             if user.staff_role == "admin": 
                 return redirect("adminside:home")  
             else:  
-                return redirect("staffside:pos")  
+                return redirect("staffside:home")  
         else: 
             messages.error(request, "Invalid Username or Password.")  
             return render(request, "loginaccount.html", {"form": form})  

@@ -1,176 +1,242 @@
-const staticPath = "/static/images";
-const categories = ["All", "Italian", "Mexican", "Beverages"];
-const products = [
-    { id: 1, name: "Pasta", price: 500, category: "Italian", image: "pasta.jpg" },
-    { id: 2, name: "Nachos", price: 350, category: "Mexican", image: "nachos.jpg" },
-    { id: 3, name: "Mint Mojito", price: 220, category: "Beverages", image: "mint-mojito.jpeg" }
-];
+document.addEventListener("DOMContentLoaded", function () {
+    // Handle category link clicks
+    document.querySelectorAll(".category-link").forEach(link => {
+        link.addEventListener("click", function () {
+            window.location.href = this.href;
+        });
+    });
 
-let selectedCategory = "All";
-let selectedTable = null;
-let cartData = {}; // Store cart data for each table
+    // Auto-hide alerts after 3 seconds
+    setTimeout(() => {
+        let alerts = document.querySelectorAll(".alert");
+        alerts.forEach(alert => {
+            alert.style.animation = "fadeOut 0.5s forwards";
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 3000);
 
-// Initialize cart data for each table
-function initializeCartData() {
-    for (let i = 1; i <= 5; i++) {
-        cartData[i] = {}; // Each table has its own empty cart
+    function showToast(message) {
+        let toast = document.createElement("div");
+        toast.className = "toast-message";
+        toast.innerHTML = `${message} <div class="toast-progress"></div>`;
+    
+        document.body.appendChild(toast);
+    
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
-}
-initializeCartData();
+    
 
-function renderCategories() {
-    const container = document.getElementById("category-container");
-    container.innerHTML = categories.map(category => `
-        <div class="col-12 col-sm-6 col-md-4 col-lg-2 text-center category-col">
-            <a href="#" class="category-link ${selectedCategory === category ? 'active' : ''}" 
-               onclick="filterProducts('${category}')">${category}</a>
-        </div>
-    `).join("");
-}
+    let tableSelector = document.getElementById("table-selector");
+    if (tableSelector) {
+        tableSelector.addEventListener("change", function () {
+            reloadWithTable(this);
+        });
+    }
 
-function filterProducts(category) {
-    selectedCategory = category;
-    renderCategories();
-    renderProducts();
-}
+    function reloadWithTable(select) {
+        const selectedTable = select.value;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('table', selectedTable);
+        window.location.href = currentUrl.href;
+    }
 
-function renderProducts() {
-    const container = document.getElementById("product-container");
-    const filteredProducts = selectedCategory === "All" ? products : products.filter(p => p.category === selectedCategory);
+    // Persist selected category
+    document.querySelectorAll(".category-link").forEach(link => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault();
+            let selectedCategory = this.getAttribute("href").split("=")[1];
+            let currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set("category", selectedCategory);
+            window.location.href = currentUrl.href;
+        });
+    });
 
-    container.innerHTML = filteredProducts.map(product => {
-        let cartItem = selectedTable && cartData[selectedTable][product.id] ? cartData[selectedTable][product.id] : { size: null, quantity: 1 };
+    document.querySelectorAll(".size-btn").forEach(button => {
+        button.addEventListener("click", function () {
 
-        return `
-        <div class="col-md-6 mb-4 d-flex justify-content-center">
-            <div class="card d-flex flex-row align-items-center p-3" style="width: 100%;">
-                <img src="${staticPath}/${product.image}" class="card-img-left" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px;">
-                <div class="card-body d-flex flex-column">
-                    <h4 class="card-title">${product.name}</h4>
-                    <p class="card-text">₹${product.price}</p>
+            let selectedTable = document.getElementById("table-selector").value; // Fetch table inside event listener
+            if (!selectedTable) {
+                showToast("Please select a table first!");
+                return;
+            }
+            let parentCard = this.closest(".product-item");
+            let form = parentCard.querySelector("form");
+            let sizeInput = form.querySelector(".selected-size");
+            let basePriceElement = form.querySelector("input[name='price']");
+            let basePrice = parseFloat(basePriceElement.dataset.basePrice);
 
-                    <!-- Size Options -->
-                    <div class="size-options mb-2">
-                        <button class="btn btn-sm btn-outline-secondary size-btn small-btn ${cartItem.size === 'Small' ? 'selected-size' : ''}" onclick="selectSize(${product.id}, 'Small')">Small</button>
-                        <button class="btn btn-sm btn-outline-secondary size-btn medium-btn ${cartItem.size === 'Medium' ? 'selected-size' : ''}" onclick="selectSize(${product.id}, 'Medium')">Medium</button>
-                        <button class="btn btn-sm btn-outline-secondary size-btn large-btn ${cartItem.size === 'Large' ? 'selected-size' : ''}" onclick="selectSize(${product.id}, 'Large')">Large</button>
-                    </div>
+            // Remove active class from all size buttons
+            parentCard.querySelectorAll(".size-btn").forEach(btn => btn.classList.remove("active"));
+            this.classList.add("active");
+    
+            // Set selected size value
+            let selectedSize = this.dataset.size;
+            sizeInput.value = selectedSize;
+    
+            // Update the price
+            let updatedPrice = basePrice;
+            if (selectedSize === "small") updatedPrice -= 100;
+            else if (selectedSize === "large") updatedPrice += 100;
+    
+            basePriceElement.value = updatedPrice;
+        });
+    });
+    
+    document.querySelectorAll(".add-to-cart-button").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault(); 
+            
+            let form = this.closest("form");
+            let selectedSize = form.querySelector(".selected-size").value;
+            let selectedTable = document.getElementById("table-selector").value;
+            let itemId = form.querySelector("input[name='food_item']").value;
+            let basePriceElement = form.querySelector("input[name='price']");
+            let basePrice = parseFloat(basePriceElement.dataset.basePrice);
+    
+            if (!selectedTable) {
+                showToast("Please select a table first!");
+                return;
+            }
+    
+            // Adjust price based on size
+            let finalPrice = basePrice;
+            if (selectedSize === "small") finalPrice -= 100;
+            else if (selectedSize === "large") finalPrice += 100;
+            basePriceElement.value = finalPrice;
+    
+            // Check if the exact size of the item already exists in the cart
+            let existingCartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"][data-size="${selectedSize}"]`);
+    
+            if (existingCartItem) {
+                // Increase quantity instead of adding a duplicate entry
+                let quantitySpan = existingCartItem.querySelector(".quantity-value");
+                let quantityInput = existingCartItem.querySelector(".quantity-input");
+                let newQuantity = parseInt(quantitySpan.innerText) + 1;
+    
+                quantitySpan.innerText = newQuantity;
+                quantityInput.value = newQuantity;
+    
+                // Submit form to update quantity
+                existingCartItem.querySelector("form").submit();
+            } else {
+                // If not already in cart, submit the form to add as a new item
+                form.submit();
+            }
+        });
+    });
+    
 
-                    <!-- Quantity Selector -->
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${product.id}, -1)">-</button>
-                        <span class="mx-2" id="quantity-${product.id}">${cartItem.quantity}</span>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${product.id}, 1)">+</button>
-                    </div>
 
-                    <!-- Add to Cart Button -->
-                    <button class="btn add-to-cart-button mt-2" id="add-to-cart-${product.id}" onclick="addToCart(${product.id})" 
-                        style="background-color: ${cartItem.size ? '#f9c784' : '#4E598C'}; color: ${cartItem.size ? 'black' : 'white'};">
-                        ${cartItem.size ? "Added to Cart" : "Add to Cart"}
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    }).join("");
-}
+    const cartContainer = document.getElementById("cart-container");
+    const totalPriceElement = document.getElementById("cart-total-price");
+    const totalItemsElement = document.getElementById("cart-items-count");
 
-document.getElementById("table-selector").addEventListener("change", function() {
-    selectedTable = this.value;
-    updateCart();
-    renderProducts();
+    if (cartContainer) {
+        cartContainer.addEventListener("click", function (event) {
+            let target = event.target;
+
+            if (target.classList.contains("increase-quantity")) {
+                updateCartItem(target, 1);
+            }
+
+            if (target.classList.contains("decrease-quantity")) {
+                updateCartItem(target, -1);
+            }
+
+            if (target.classList.contains("remove-cart-item")) {
+                removeCartItem(target);
+            }
+        });
+
+        updateCartSummary();
+    }
+
+    function updateCartItem(target, change) {
+        let cartItem = target.closest(".cart-item");
+        let quantitySpan = cartItem.querySelector(".quantity-value");
+        let quantityInput = cartItem.querySelector(".quantity-input");
+        let itemId = cartItem.dataset.itemId;
+        let size = cartItem.dataset.size;
+
+        let newQuantity = parseInt(quantitySpan.innerText) + change;
+
+        if (newQuantity >= 1) {
+            quantitySpan.innerText = newQuantity;
+            quantityInput.value = newQuantity;
+
+            updateCartSummary();
+
+            let updateForm = cartItem.querySelector(".update-cart-form");
+            let hiddenSizeInput = updateForm.querySelector("input[name='size']");
+            let hiddenItemInput = updateForm.querySelector("input[name='item_id']");
+
+            if (hiddenSizeInput && hiddenItemInput) {
+                hiddenSizeInput.value = size;
+                hiddenItemInput.value = itemId;
+            }
+
+            updateForm.submit();
+        }
+    }
+
+    function removeCartItem(target) {
+        let cartItem = target.closest(".cart-item");
+        cartItem.remove();
+        updateCartSummary();
+
+        let form = cartItem.querySelector(".remove-cart-form");
+        if (form) {
+            form.submit();
+        }
+    }
+
+    function updateCartSummary() {
+        let cartItems = document.querySelectorAll(".cart-item");
+        let total = 0;
+        let itemCount = 0;
+
+        cartItems.forEach(cartItem => {
+            let quantity = parseInt(cartItem.querySelector(".quantity-value").innerText);
+            let price = parseFloat(cartItem.dataset.unitPrice);
+
+            total += (quantity * price);
+            itemCount += quantity;
+        });
+
+        if (totalPriceElement) totalPriceElement.innerText = `₹${total.toFixed(2)}`;
+        if (totalItemsElement) totalItemsElement.innerText = `${itemCount}`;
+    }
+
+    function updateSizeSelection(foodItem, cartSizes) {
+        document.querySelectorAll(`[data-food='${foodItem}'] .size-btn`).forEach(button => {
+            if (cartSizes.includes(button.dataset.size)) {
+                button.classList.add("active");
+            } else {
+                button.classList.remove("active");
+            }
+        });
+    }
+
+    document.querySelectorAll(".remove-cart-item").forEach(button => {
+        button.addEventListener("click", function () {
+            let cartItem = this.closest(".cart-item");
+            let foodItem = cartItem.dataset.food;
+            let size = cartItem.querySelector(".cart-size").textContent.trim();
+
+            cartItem.remove();
+
+            let cartSizes = Array.from(document.querySelectorAll(`.cart-item[data-food='${foodItem}'] .cart-size`)).map(el => el.textContent.trim());
+
+            updateSizeSelection(foodItem, cartSizes);
+        });
+    });
 });
 
-function selectSize(productId, size) {
-    if (!selectedTable) {
-        alert("Please select a table first!");
-        return;
-    }
-
-    if (!cartData[selectedTable][productId]) {
-        cartData[selectedTable][productId] = { size: size, quantity: 1 };
-    } else {
-        cartData[selectedTable][productId].size = size;
-    }
-
-    renderProducts();
+function reloadWithTable(selectElement) {
+    let tableId = selectElement.value;
+    let currentCategory = new URLSearchParams(window.location.search).get('category') || 'all';
+    window.location.href = `?category=${currentCategory}&table_id=${tableId}`;
 }
 
-function updateQuantity(productId, change) {
-    if (!selectedTable || !cartData[selectedTable][productId]) return;
-
-    cartData[selectedTable][productId].quantity = Math.max(1, cartData[selectedTable][productId].quantity + change);
-    document.getElementById(`quantity-${productId}`).innerText = cartData[selectedTable][productId].quantity;
-    updateCart();
-}
-
-function addToCart(productId) {
-    if (!selectedTable) {
-        alert("Please select a table before adding items to the cart!");
-        return;
-    }
-
-    if (!cartData[selectedTable][productId] || !cartData[selectedTable][productId].size) {
-        alert("Please select a size before adding to cart!");
-        return;
-    }
-
-    updateCart();
-    renderProducts();
-}
-
-function updateCart() {
-    const container = document.getElementById("cart-container");
-    let totalPrice = 0;
-    let totalItems = 0;
-
-    if (!selectedTable || Object.keys(cartData[selectedTable]).length === 0) {
-        container.innerHTML = "<p class='text-center'>Cart is empty</p>";
-        document.getElementById("cart-total-price").innerText = `₹0.00`;
-        document.getElementById("cart-items-count").innerText = 0;
-        return;
-    }
-
-    container.innerHTML = `
-        <p><strong>Table: </strong> ${selectedTable || "Not selected"}</p>
-        ${Object.keys(cartData[selectedTable]).map(productId => {
-            let item = cartData[selectedTable][productId];
-            let product = products.find(p => p.id == productId);
-            let itemTotal = product.price * item.quantity;
-            totalPrice += itemTotal;
-            totalItems += item.quantity;
-
-            return `
-            <div class="cart-item d-flex">
-                <img src="${staticPath}/${product.image}" class="cart-item-img">
-                <div class="cart-item-info">
-                    <strong>${product.name}</strong><span>(${item.size})</span>
-                    <p>₹${product.price} x ${item.quantity}</p>
-                    <div class="cart-item-controls">
-                        <button onclick="updateQuantity(${product.id}, -1)">-</button>
-                        <span>${item.quantity}</span>
-                        <button onclick="updateQuantity(${product.id}, 1)">+</button>
-                    </div>
-                </div>
-                <button class="btn" onclick="removeFromCart(${product.id})">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            `;
-        }).join("")}
-    `;
-
-    document.getElementById("cart-total-price").innerText = `₹${totalPrice.toFixed(2)}`;
-    document.getElementById("cart-items-count").innerText = totalItems;
-}
-
-function removeFromCart(productId) {
-    if (!selectedTable) return;
-
-    delete cartData[selectedTable][productId];
-    updateCart();
-    renderProducts();
-}
-
-renderCategories();
-renderProducts();
