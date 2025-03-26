@@ -28,11 +28,29 @@ class CustomLoginForm(forms.Form):
                 return cleaned_data  
 
             if not check_password(password, staff.password): 
-                print(password) 
-                print(staff.password)
                 self.add_error("password", "Incorrect Password.")  
                 return cleaned_data  
 
             cleaned_data["staff"] = staff  
 
         return cleaned_data  
+    
+
+class PasswordResetForm(forms.Form):
+    email_or_phone = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your email to receive an OTP"
+        }),
+        label=""  # This removes the label
+    )
+    
+    def clean_email_or_phone(self):
+        email_or_phone = self.cleaned_data.get("email_or_phone")
+        user = Staff.objects.filter(staff_email=email_or_phone).first() or \
+               Staff.objects.filter(staff_phone=email_or_phone).first()
+
+        if not user:
+            raise forms.ValidationError("No account found with this Email")
+
+        return email_or_phone

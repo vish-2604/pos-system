@@ -350,7 +350,6 @@ def purchase(request):
     branches = Branch.objects.all()
     
     if request.method == 'POST':
-        print("POST data received:", request.POST)
 
         delete_id = request.POST.get('delete_purchase_id')
         if delete_id:
