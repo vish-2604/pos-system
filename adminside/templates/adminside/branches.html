@@ -71,15 +71,15 @@
           <select name="manager_id" id="managerID">
             <option value="" disabled selected>Choose manager</option>
             {% for staff in staff_members %}
-              {% if staff.is_active %}
-              <option value="{{ staff.staff_id }}" {% if staff.staff_id == branch.manager.staff_id %}selected{% endif %}>
-                {{ staff.staff_fullname }}
-              </option>
-              {% endif %}
+            {% if staff.is_active %}
+            <option value="{{ staff.staff_id }}" {% if staff.staff_id|slugify == branch.manager.staff_id|slugify %}selected{% endif %}>
+              {{ staff.staff_fullname }}
+            </option>            
+            {% endif %}
             {% endfor %}
-          </select>                   
+          </select>
         </div>
-        
+
 
         <div class="input-group">
           <label for="PhoneNo"><b>Phone No.</b></label>
@@ -141,16 +141,22 @@
           <td>
             <div class="action-buttons">
               <button class="update-btn"><i class="fas fa-edit"></i></button>
+              <button type="button" class="delete-btn" onclick="openDeleteModal('{{ branch.branch_id }}')">
+                <i class="fas fa-trash"></i>
+              </button>
 
-              <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="delete_branch_id" value="{{ branch.branch_id }}">
-                <button type="submit" class="delete-btn"
-                    onclick="return confirm('Are you sure you want to delete this branch?');">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </form>            
-
+              <div id="deleteModal" class="modal">
+                <div class="modal-content">
+                  <p>Are you sure you want to delete this branch?</p>
+                  <form id="deleteForm" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_branch_id" id="delete_branch_id">
+                    <button type="submit" class="confirm-btn">Yes, Delete</button>
+                    <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+                  </form>
+                </div>
+              </div>
+              
             </div>
           </td>
         </tr>

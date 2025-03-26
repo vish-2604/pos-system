@@ -28,7 +28,6 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
 function openForm() {
   document.getElementById("itemName").value = "";  
   document.getElementById("itemCategory").value = "";
-  document.getElementById("itemQuantity").value = "";
   
   document.getElementById("myForm").style.display = "block";
   document.getElementById("overlay").style.display = "block"; 
@@ -46,7 +45,6 @@ function validateForm(event) {
   let name = document.getElementById("itemName").value.trim();
   let category = document.getElementById("itemCategory").value;
   let description = document.getElementById("itemDescription").value.trim();
-  let quantity = document.getElementById("itemQuantity").value.trim();
   let sellingPrice = document.getElementById("itemSelling").value.trim();
   let costPrice = document.getElementById("itemCost").value.trim();
   let mfgDate = document.getElementById("itemMFG").value;
@@ -74,10 +72,6 @@ function validateForm(event) {
   }
   if (description === "") {
     showError("itemDescription", "Description is required");
-    isValid = false;
-  }
-  if (quantity === "" || quantity <= 0) {
-    showError("itemQuantity", "Enter a valid quantity");
     isValid = false;
   }
   if (sellingPrice === "" || sellingPrice <= 0) {
@@ -126,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
           inventoryIdInput.value = inventoryData.id || "";
           document.getElementById("itemName").value = inventoryData.name || "";
           document.getElementById("itemDescription").value = inventoryData.description || "";
-          document.getElementById("itemQuantity").value = inventoryData.stock || "";
           document.getElementById("itemCost").value = inventoryData.cost || "";
           document.getElementById("itemSelling").value = inventoryData.price || "";
           document.getElementById("itemMFG").value = inventoryData.mfg_date || "";
@@ -166,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
               name: row.cells[2].textContent.trim(),
               category_id: row.cells[3].getAttribute("data-category-id"),
               description: row.cells[4].textContent.trim(),
-              stock: row.cells[6].textContent.trim(),
               price: row.cells[8].textContent.trim(),
               cost: row.cells[9].textContent.trim(),
               mfg_date: row.cells[10].textContent.trim(),
@@ -188,3 +180,12 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }, 3000);
 });
+
+function openDeleteModal(itemId) {
+  document.getElementById("delete_inventory_id").value = itemId;
+  document.getElementById("deleteModal").style.display = "flex";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}

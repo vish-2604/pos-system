@@ -1,27 +1,13 @@
-function toggleSearch() {
-    let searchContainer = document.querySelector(".search-container");
-    let searchInput = document.querySelector(".search-input");
-  
-    searchContainer.classList.toggle("active");
-    if (searchContainer.classList.contains("active")) {
-      searchInput.focus();
-    }
-  }
-  
-  document.getElementById("searchInput").addEventListener("keyup", function () {
-    let filter = this.value.trim().toLowerCase();
-    let rows = document.querySelectorAll("#salesTableBody tr");  
+function filterReports() {
+  let filterValue = document.getElementById("incomeDropdown").value;
+  window.location.href = `?filter=${filterValue}`;  // Reload with query param
+}
 
-    rows.forEach(function (row) {
-        let itemname = row.cells[1]?.textContent.trim().toLowerCase(); 
-        let category = row.cells[2]?.textContent.trim().toLowerCase(); 
-
-        if (itemname.includes(filter) || category.includes(filter)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
-    });
+// Set the selected filter when the page loads
+document.addEventListener("DOMContentLoaded", function() {
+  let params = new URLSearchParams(window.location.search);
+  let filterValue = params.get("filter") || "all";  // Default to "all"
+  document.getElementById("incomeDropdown").value = filterValue;
 });
 
 

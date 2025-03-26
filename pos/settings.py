@@ -42,7 +42,13 @@ INSTALLED_APPS = [
      "staffside",
      "accounts",
      'rest_framework',
+     'django.contrib.humanize',
+      'django_celery_beat',
 ]
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use Redis as a broker
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -117,11 +123,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata' 
+
+USE_TZ = True 
 
 USE_I18N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -130,7 +137,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'adminside/static/'),os.path.join(BASE_DIR, 'staffside/static/')]
 STATIC_ROOT = BASE_DIR / "staticfiles" 
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -151,3 +157,4 @@ EMAIL_HOST_PASSWORD = 'pgdb zhpx qmzw fvvu'
 
 
 AUTH_USER_MODEL = 'adminside.Staff' 
+

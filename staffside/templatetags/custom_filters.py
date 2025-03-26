@@ -26,3 +26,11 @@ def extract_name(value):
     return value 
 
 
+@register.filter
+def percentage(value, percent):
+    """Calculate a percentage increase or decrease."""
+    try:
+        return round(float(value) * (1 + float(percent) / 100), 2)
+    except (ValueError, TypeError):
+        return value
+

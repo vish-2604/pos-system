@@ -166,3 +166,12 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }, 3000);
 });
+
+function openDeleteModal(branchId) {
+  document.getElementById("delete_branch_id").value = branchId;
+  document.getElementById("deleteModal").style.display = "flex";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}

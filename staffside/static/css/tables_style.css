@@ -312,3 +312,132 @@ p {
 }
 
 
+
+/* Add hover effect for table cards */
+.table-card {
+  cursor: pointer; /* Makes it clear that the table is clickable */
+  transition: transform 0.3s ease-in-out; /* Smooth transition */
+}
+
+.table-card:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+/* Set the modal width and height */
+#tableModal .modal-dialog {
+  max-width: 500px;  /* Set width */
+  width: 90%;        /* Make modal responsive */
+}
+
+#tableModal .modal-content {
+  padding: 20px;
+  height: auto;  /* Ensure height adapts to content */
+}
+
+/* Customize the toggle switch color */
+.form-check-input:checked {
+  background-color: #FF8C42; /* Set the color when checked */
+  border-color: #FF8C42;     /* Set border color when checked */
+}
+
+.form-check-input:focus {
+  border-color: #FF8C42;     /* Set border focus color */
+  box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.25); /* Focus outline */
+}
+
+.form-check-label {
+  color: #333; /* Adjust label color */
+  font-weight: 600; /* Make label text bold */
+}
+
+/* Optional: Adjust button style if needed */
+.btn {
+  font-weight: bold;
+  padding: 10px 20px;
+}
+
+
+.table{
+  table-layout: none;
+}
+
+/* Center and Uppercase Order ID */
+.order-id {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Ensure Table is Scrollable */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Prevent text from breaking badly */
+.table td {
+  white-space: nowrap;
+}
+
+/* Space between table and total/status */
+.order-summary {
+  margin-top: 15px;
+}
+
+/* Align Total and Status in one row */
+.total-status-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+/* On small screens, stack Total and Status */
+@media (max-width: 576px) {
+  .total-status-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+  }
+}
+
+/* Style for status badge */
+.status-badge {
+background-color: #F9C784;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 5px;  
+}
+
+
+#tableModal .modal-dialog {
+  max-width: 500px;
+  width: 90%;
+}
+
+#tableModal .modal-content {
+  padding: 20px;
+  height: auto;
+}
+
+.form-check-input {
+  width: 3rem !important;
+  height: 1.5rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+  background-color: #FF8C42;
+  border-color: #FF8C42;
+}
+
+.form-check-input:focus {
+  border-color: #FF8C42;
+  box-shadow: 0 0 0 0.2rem rgba(255, 140, 66, 0.25);
+}
+
+.form-check-label {
+  font-size: 1.1rem;
+  margin-left: 0.8rem;
+}

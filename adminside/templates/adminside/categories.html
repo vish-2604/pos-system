@@ -82,14 +82,27 @@
               </td>        
               <td>
                 <div class="action-buttons">
+
                   <button class="update-btn"><i class="fas fa-edit"></i></button>
-                  <form method="POST" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="delete_category_id" value="{{ category.categories_id }}">
-                    <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this category?');">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </form>
+                  
+                <button type="button" class="delete-btn" onclick="openDeleteModal('{{ category.categories_id }}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+
+                <!-- Delete Confirmation Modal -->
+                <div id="deleteModal" class="modal">
+                  <div class="modal-content">
+                      <p>Are you sure you want to delete this category?</p>
+                      <form id="deleteForm" method="POST">
+                          {% csrf_token %}
+                          <input type="hidden" name="delete_category_id" id="delete_category_id">
+                          <button type="submit" class="confirm-btn">Yes, Delete</button>
+                          <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+                      </form>
+                  </div>
+                </div>
+
+
                 </div>
               </td>
             </tr>

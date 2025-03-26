@@ -20,13 +20,13 @@ admin.site.register(Purchase, PurchaseAdmin)
 
 class InventoryAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "image", "purchase", "category", "description", "stock", "price", "cost",
-        "mfg_date", "exp_date"
+        "id", "image", "purchase", "category", "description", "price", "cost",
+        "mfg_date", "exp_date","quantity"
     )
 admin.site.register(Inventory, InventoryAdmin)
 
 class FoodItemAdmin(admin.ModelAdmin):
-    list_display = ("id","image", "name","category" , "price", "description", "quantity","is_special")
+    list_display = ("id","image", "name","category" , "price", "description", "quantity",'branch',"is_special")
 admin.site.register(FoodItem, FoodItemAdmin)
 
 

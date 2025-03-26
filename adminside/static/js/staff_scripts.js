@@ -208,3 +208,11 @@ document.addEventListener("DOMContentLoaded", function() {
   }, 3000);
 });
 
+function openDeleteModal(staffId) {
+  document.getElementById("delete_staff_id").value = staffId;
+  document.getElementById("deleteModal").style.display = "block";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}

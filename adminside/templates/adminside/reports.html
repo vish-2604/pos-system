@@ -1,54 +1,70 @@
-{% load static %}
+{% load static %} 
 {% block title %}
-<title>Sale & Reports</title>
-{% endblock %}
+<title>REPORT</title>
+{% endblock %} 
+
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/reports_style.css' %}">
+<link rel="stylesheet" href="{% static 'css/reports_style.css' %}" />
 {% endblock %}
 
-<div class="food-items-page">
-  <div class="food-item-title mt-4">
-    <h3>SALES &   REPORTS</h3>
+<div class="staff-page">
+  <div class="staff-title mt-4">
+    <h3>REPORTS</h3>
 
-    
-    <div class="search-container">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search by category or name">
-      <button class="search-btn" onclick="toggleSearch()">
-        <i class="fa fa-search"></i>
-      </button>
+    <!-- Moved the dropdown for better layout -->
+    <div class="filter-container">
+      <label for="incomeDropdown" class="filter-label">Filter By:</label>
+      <select id="incomeDropdown" class="dropdown" onchange="filterReports()">
+        <option value="all">All</option>
+        <option value="today">Today</option>
+        <option value="monthly">Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
     </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="table fooditem-detail-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Category</th>
-          <th>Quantity Sold</th>
-          <th>Total Price</th>
-          <th>Sold Date</th>
-        </tr>
-      </thead>
-      <tbody id="salesTableBody">
-        {% for item in sales_reports %}
-        <tr>
-          <td>{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.category.categories_name }}</td>
-          <td>{{ item.quantity_sold }}</td>
-          <td>{{ item.total_price }}</td>
-          <td>{{ item.sold_date }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="7" style="text-align: center;">No sales reports available</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>    
-  </div>
+  <br>
+
+  <table>
+    <thead>
+      <tr style="border-bottom: 2px solid black;">
+        <th>Date</th>
+        <th>Branch</th>
+        <th>Product</th>
+        <th>Image</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in data %}
+      {% for branch in entry.branches %}
+      {% for product in branch.products %}
+      <tr style="border-bottom: 1px solid grey;">
+        {% if forloop.parentloop.first and forloop.first %}
+        <td rowspan="{{ branch.products|length }}"
+          style="border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 5px;">
+          {{ entry.date }}
+        </td>
+        <td rowspan="{{ branch.products|length }}"
+          style="border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 5px;">
+          {{ branch.branch_name }}
+        </td>
+        {% endif %}
+        <td>{{ product.name }}</td>
+        <td>
+          <img src="{{ product.image }}" alt="{{ product.name }}" width="40" height="40">
+        </td>
+        <td>{{ product.quantity }}</td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center">No branches found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
-<script src="{% static 'js/fooditem_scripts.js' %}"></script>
+<script src="{% static 'js/reports_scripts.js' %}"></script>

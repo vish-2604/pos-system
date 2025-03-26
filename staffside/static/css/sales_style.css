@@ -47,6 +47,12 @@
     font-size: 15px;
 }
 
+.search-btn:hover{
+    background-color: #f2a23a !important;
+    opacity: 0.8;
+    color: black !important;
+}
+
 .search-btn i {
     font-size: 15px;
 }
@@ -121,3 +127,13 @@
 
 }
 
+.receipte-btn{
+    background-color: #4E598C !important;
+    color: white !important;
+}
+
+.receipte-btn:hover{
+    background-color: #777d97  !important;
+    opacity: 0.8;
+    color: black !important;
+}

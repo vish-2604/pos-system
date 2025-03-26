@@ -126,10 +126,11 @@
 .cart-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 10px;
+    gap: 15px;
+    padding: 15px;
     border-bottom: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f9f9f9;
 }
 
 .cart-item img {
@@ -162,6 +163,12 @@
     cursor: pointer;
 }
 
+.add-to-cart-button:hover{
+    background-color: #777d97  !important;
+    opacity: 0.8;
+    color: black !important;
+}
+
 .total-price {
     font-size: 18px;
     font-weight: bold;
@@ -176,8 +183,10 @@
 }
 
 .place-order-btn:hover {
-    background-color: #a2a2a4;
+    background-color: #777d97;
+    opacity: 0.8;
     color: black;
+
 }
 
 .payment-btn {
@@ -190,8 +199,10 @@
 }
 
 .payment-btn:hover {
-    background-color: #a2a2a4;
+    background-color: #777d97;
+    opacity: 0.8;
     color: black;
+
 }
 
 .btn-light {
@@ -525,3 +536,17 @@
         width: 0;
     }
 }
+
+.apply-btn{
+    background-color: #4E598C;
+    color: white;
+}
+
+.apply-btn:hover{
+    background-color: #777d97;
+    opacity: 0.8;
+    color: black;
+}
+
+
+  

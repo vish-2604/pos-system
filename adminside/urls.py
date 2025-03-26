@@ -15,6 +15,7 @@ urlpatterns = [
     path('tables/', views.tables, name='tables'),
     path('customer/', views.customer, name='customer'),
     path('staff/', views.staff, name='staff'),
+    path('sales/', views.sales, name='sales'),
     path('reports/', views.reports, name='reports'),
     path('settings/', views.adminside_settings_view, name='settings'),
     path('profile/', views.profile, name='profile'),

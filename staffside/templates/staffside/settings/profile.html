@@ -1,0 +1,30 @@
+{% load static %}
+{% block title %}
+<title>Profile</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/settings/profile_style.css' %}">
+{% endblock %}
+
+
+<div class="container">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div id="default-content">
+        <div class="profile-pic-container">
+            <img id="profileImage" src="{{ user.staff_img.url }}" alt="Profile Picture" class="profile-pic">
+        </div>
+
+        <h2>Welcome Admin!<br>This is Your Account Settings</h2>
+        <p>Select an option from the sidebar.</p>
+    </div>
+</div>
+<script src="{% static 'js/settings/profile_scripts.js' %}"></script>

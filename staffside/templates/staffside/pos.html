@@ -1,4 +1,6 @@
 {% load static %}
+{% load custom_filters %}
+
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pos_style.css' %}">
@@ -51,6 +53,7 @@
                             <form method="POST"
                                 action="{% url 'staffside:add_to_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
                                 {% csrf_token %}
+                                <input type="hidden" name="image_url" value="{{ item.image.url }}">
                                 <input type="hidden" name="table_id" id="selected_table_id"
                                     value="{{ selected_table }}">
                                 <input type="hidden" name="food_item" value="{{ item.name }}">
@@ -82,15 +85,18 @@
                             <!-- Price List -->
                             <p class="card-text"
                                 style="font-size: 12px; display: flex; justify-content: space-between;">
-                                <span>Small</span> <span>₹{{ item.price|add:"-100" }}</span>
+                                <span>Small</span>
+                                <span>₹{{ item.price|percentage:"-20" }}</span>
                             </p>
                             <p class="card-text"
                                 style="font-size: 12px; display: flex; justify-content: space-between;">
-                                <span>Medium</span> <span>₹{{ item.price }}</span>
+                                <span>Medium</span>
+                                <span>₹{{ item.price }}</span>
                             </p>
                             <p class="card-text"
                                 style="font-size: 12px; display: flex; justify-content: space-between;">
-                                <span>Large</span> <span>₹{{ item.price|add:"100" }}</span>
+                                <span>Large</span>
+                                <span>₹{{ item.price|percentage:"20" }}</span>
                             </p>
 
                             <!-- Size Selection -->
@@ -112,16 +118,34 @@
 
         </div>
         <div class="col-md-3 cart-container p-4">
+            <div class="search-container mb-3">
+                <form method="GET" action="" class="d-flex">
+                    <input type="text" name="search" class="form-control" placeholder="Search food items"
+                        value="{{ search_query }}" id="search-input">
+                    <button type="submit" class="btn"
+                        style="background-color: #f9c784 ; color:black; margin-left: 10px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+
             <div class="cart-header d-flex justify-content-between align-items-center">
                 <h3 class="cart-title">Cart</h3>
                 <select id="table-selector" class="form-select w-50" onchange="reloadWithTable(this)">
                     <option value="" disabled {% if not selected_table %}selected{% endif %}>Choose table</option>
                     {% for table in tables %}
-                    <option value="{{ table.table_id }}" {% if table.table_id|stringformat:'s' == selected_table|stringformat:'s' %} selected {% endif %}>
-                        Table-{{ table.table_id }}
-                    </option>
+                        {% if table.status == "reserved" %}
+                            <option value="{{ table.table_id }}" disabled>
+                                Table-{{ table.table_id }} (R)
+                            </option>
+                        {% else %}
+                            <option value="{{ table.table_id }}" {% if table.table_id|stringformat:"s" == selected_table %} selected {% endif %}>
+                                Table-{{ table.table_id }}
+                            </option>
+                        {% endif %}
                     {% endfor %}
-                </select>
+                </select>                
 
                 <form method="POST" action="{% url 'staffside:add_to_cart' %}">
                     {% csrf_token %}
@@ -137,59 +161,58 @@
             <hr>
             <div id="cart-container" class="cart-items">
                 {% if cart_items %}
-                {% for item in cart_items %}
-                <div class="cart-item d-flex align-items-center justify-content-between p-2 border"
-                    data-unit-price="{{ item.price|floatformat:2 }}" data-item-id="{{ item.cart_id }}"
-                    data-size="{{ item.size }}">
-                    <div class="cart-details">
-                        <p class="mb-0"><strong>{{ item.order_item }}</strong></p>
-                        <p class="mb-0">Size: {{ item.size }}</p>
-                        <p class="mb-0">₹<span class="price-value">{{ item.price|floatformat:2 }}</span></p>
-                    </div>
-                    <div class="cart-quantity d-flex">
-                        <form method="POST" action="{% url 'staffside:update_cart' %}">
+                    {% for item in cart_items %}
+                    <div class="cart-item d-flex align-items-center justify-content-between p-2 border"
+                        data-unit-price="{{ item.price|floatformat:2 }}" data-item-id="{{ item.cart_id }}"
+                        data-size="{{ item.size }}">
+                        <div class="cart-details">
+                            <p class="mb-0"><strong>{{ item.order_item }}</strong></p>
+                            <p class="mb-0">Size: {{ item.size }}</p>
+                            <p class="mb-0">₹<span class="price-value">{{ item.price|floatformat:2 }}</span></p>
+                        </div>
+                        <div class="cart-quantity d-flex">
+                            <form method="POST" action="{% url 'staffside:update_cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="table_id" value="{{ selected_table }}">
+                                <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
+                                <input type="hidden" name="action" value="decrease">
+                                <input type="hidden" name="category" value="{{ selected_category }}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                            </form>
+
+                            <span class="mx-2 quantity-value">{{ item.quantity }}</span>
+
+                            <form method="POST" action="{% url 'staffside:update_cart' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="table_id" value="{{ selected_table }}">
+                                <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
+                                <input type="hidden" name="action" value="increase">
+                                <input type="hidden" name="category" value="{{ selected_category }}">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
+                            </form>
+                        </div>
+
+                        <form method="POST"
+                            action="{% url 'staffside:update_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
                             {% csrf_token %}
                             <input type="hidden" name="table_id" value="{{ selected_table }}">
                             <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
-                            <input type="hidden" name="action" value="decrease">
-                            <input type="hidden" name="category" value="{{ selected_category }}">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">-</button>
+                            <input type="hidden" name="quantity" class="quantity-input" value="{{ item.quantity }}">
                         </form>
 
-                        <span class="mx-2 quantity-value">{{ item.quantity }}</span>
-
-                        <form method="POST" action="{% url 'staffside:update_cart' %}">
+                        <!-- Remove button -->
+                        <form method="POST"
+                            action="{% url 'staffside:remove_from_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
                             {% csrf_token %}
                             <input type="hidden" name="table_id" value="{{ selected_table }}">
                             <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
-                            <input type="hidden" name="action" value="increase">
-                            <input type="hidden" name="category" value="{{ selected_category }}">
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
+                            <button type="submit" class="btn btn-sm" style="font-size: 20px;"><i
+                                    class="fa-solid fa-xmark"></i></button>
                         </form>
                     </div>
-
-                    <form method="POST"
-                        action="{% url 'staffside:update_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="table_id" value="{{ selected_table }}">
-                        <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
-                        <input type="hidden" name="quantity" class="quantity-input" value="{{ item.quantity }}">
-                    </form>
-                    
-                    <!-- Remove button -->
-                    <form method="POST"
-                        action="{% url 'staffside:remove_from_cart' %}?category={{ selected_category }}{% if selected_table %}&table_id={{ selected_table }}{% endif %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="table_id" value="{{ selected_table }}">
-                        <input type="hidden" name="order_item_id" value="{{ item.cart_id }}">
-                        <button type="submit" class="btn btn-sm" style="font-size: 20px;"><i class="fa-solid fa-xmark"></i></button>
-                    </form>
-
-
-                </div>
-                {% endfor %}
+                    {% endfor %}
                 {% else %}
-                <p class="text-center">Cart is empty</p>
+                    <p class="text-center">Cart is empty</p>
                 {% endif %}
             </div>
             <hr>
@@ -201,16 +224,46 @@
             <form method="POST" action="{% url 'staffside:place_order' %}">
                 {% csrf_token %}
                 <input type="hidden" name="table_id" class="selected-table-id" value="{{ selected_table }}">
-                <button type="submit" class="btn btn-primary w-100 place-order-btn">Place an order</button>
+                <button type="submit" class="btn w-100 place-order-btn">Place an order</button>
             </form>
-            <form method="POST" action="{% url 'staffside:process_payment' %}">
-                {% csrf_token %}
-                <input type="hidden" name="table_id" class="selected-table-id" value="{{ selected_table }}">
-                <button type="submit" class="btn btn-primary w-100 payment-btn">Payment</button>
-            </form>
-            
+
+            <button type="button" class="btn w-100 payment-btn" data-toggle="modal" data-target="#discountModal">
+                Payment
+            </button>
+
         </div>
     </div>
 </div>
+
+
+
+<!-- Discount Modal -->
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discountModalLabel">Apply Discount?</h5>
+                <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'staffside:process_payment' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="table_id" class="selected-table-id" value="{{ selected_table }}">
+
+                    <p>Do you want to apply a discount?</p>
+                    <div class="form-group">
+                        <label>Discount Percentage:</label>
+                        <input type="number" name="discount_percentage" class="form-control mt-2" min="0" max="100"
+                            placeholder="Enter discount %">
+                    </div>
+
+                    <button type="submit" class="btn apply-btn w-100 mt-3">Apply & Pay</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script src="{% static 'js/pos_scripts.js' %}"></script>

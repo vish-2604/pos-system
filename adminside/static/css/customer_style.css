@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  margin: 0px 3px auto 30px;
+  margin: 0px 3px auto 10px;
 }
 
 .btn-icon {
@@ -125,13 +125,7 @@
   }
 }
 
-@media (max-width: 768px) {
-  .customer-title {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-
+@media (max-width: 830px) {
   .add-customer-button {
     padding: 6px;
   }
@@ -146,6 +140,15 @@
     height: 28px;
     border-radius: 2px;
     width: 28px;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .customer-title {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .table-responsive {
@@ -352,3 +355,46 @@
   100% { opacity: 0; }
 }
 
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-btn {
+  background-color:  #4e598c;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.cancel-btn {
+  background-color: gray;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

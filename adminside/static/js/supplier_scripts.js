@@ -157,3 +157,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }, 3000);
 });
+
+
+function openDeleteModal(supplierId) {
+  document.getElementById("delete_supplier_id").value = supplierId;
+  document.getElementById("deleteModal").style.display = "block";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}

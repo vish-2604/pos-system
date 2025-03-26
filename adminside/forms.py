@@ -155,7 +155,7 @@ class CategoryForm(forms.ModelForm):
 class InventoryForm(forms.ModelForm):
     class Meta:
         model = Inventory
-        fields = ['image', 'purchase', 'category', 'description', 'stock', 'price', 'cost', 'mfg_date', 'exp_date', 'active']
+        fields = ['image', 'purchase', 'category', 'description', 'price', 'cost', 'mfg_date', 'exp_date', 'active']
 
     def clean_price(self):
         """Ensure selling price is not negative."""

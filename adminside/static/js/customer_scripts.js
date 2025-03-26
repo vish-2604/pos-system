@@ -157,3 +157,12 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }, 3000);
 });
+
+function openDeleteModal(customerId) {
+  document.getElementById("delete_customer_id").value = customerId;
+  document.getElementById("deleteModal").style.display = "block";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}

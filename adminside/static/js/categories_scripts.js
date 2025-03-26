@@ -74,3 +74,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }, 3000);
 });
+
+function openDeleteModal(categoryId) {
+    document.getElementById("delete_category_id").value = categoryId;
+    document.getElementById("deleteModal").style.display = "block";
+}
+
+function closeDeleteModal() {
+    document.getElementById("deleteModal").style.display = "none";
+}

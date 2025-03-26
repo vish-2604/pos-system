@@ -178,3 +178,12 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }, 3000);
 });
+
+function openDeleteModal(purchaseId) {
+  document.getElementById("delete_purchase_id").value = purchaseId;
+  document.getElementById("deleteModal").style.display = "block";
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").style.display = "none";
+}

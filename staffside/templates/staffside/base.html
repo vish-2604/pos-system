@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,69 +18,194 @@
 
     <!-- base.html css (style.css) -->
     {% block css%}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     {% endblock %}
+
+    <style>
+        .notification-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notification-link {
+            position: relative;
+            font-size: 20px;
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .notification-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #FF8C42;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+        }
+
+        .notifications-dropdown {
+            display: none;
+            position: absolute;
+            width: 250px;
+            /* Adjust width */
+            height: auto;
+            /* Allow dynamic height */
+            max-height: 300px;
+            /* Prevent it from getting too long */
+            background: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            right: 10px;
+            top: 50px;
+            z-index: 1000;
+            overflow-y: auto;
+            /* Enables scrolling if content overflows */
+        }
+
+        .notifications-dropdown h4 {
+            margin: 0;
+            padding-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .notifications-dropdown ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        .notifications-dropdown ul li {
+            padding: 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .notifications-dropdown ul li:last-child {
+            border-bottom: none;
+        }
+    </style>
 
     <!-- google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
 
     <div class="top-navbar">
         <div class="user-info">
-          <span class="notification"><i class="fa-solid fa-bell"></i></span>
-          <span id="current-date">{{ user.username }}<br /></span>
-          <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image"
-            class="staff-profile-img rounded-circle"
-            style="width: 50px; height: 50px; object-fit: cover;margin-left: -3px;margin-bottom: 8px;">
+            <div class="notification-container">
+                <a href="#" class="notification-link" onclick="toggleNotifications(event)">
+                    <i class="fa-solid fa-bell"></i>
+                    {% if has_unseen %}
+                    <span id="notification-dot" class="notification-dot" style="background-color: orange;"></span>
+                    {% endif %}
+                </a>
+            
+                <div id="notificationDropdown" class="notifications-dropdown"
+                    style="{% if open_notifications %}display: block;{% else %}display: none;{% endif %}">
+                    <h4>Notifications</h4>
+                    <ul>
+                        {% for notification in notifications %}
+                        <li style="{% if notification in unseen_notifications %}font-weight: bold;{% endif %}">
+                            {{ notification.message }}
+                        </li>
+                        {% empty %}
+                        <li>No new notifications</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <script>
+                function toggleNotifications(event) {
+                    event.preventDefault(); // Prevent default link behavior
+            
+                    let dropdown = document.getElementById("notificationDropdown");
+                    let dot = document.getElementById("notification-dot");
+            
+                    if (dropdown.style.display === "block") {
+                        dropdown.style.display = "none"; // Close dropdown on second click
+                    } else {
+                        dropdown.style.display = "block"; // Open dropdown on first click
+                        dot?.remove(); // Hide orange dot when opening
+                    }
+                }
+            
+                // Close dropdown when clicking outside
+                document.addEventListener("click", function(event) {
+                    let dropdown = document.getElementById("notificationDropdown");
+                    let bell = document.querySelector(".notification-link");
+            
+                    if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                        dropdown.style.display = "none";
+                    }
+                });
+            </script>
+            
+        
+            <span id="current-date">{{ user.username }}<br /></span>
+            <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image"
+                class="staff-profile-img rounded-circle"
+                style="width: 50px; height: 50px; object-fit: cover;margin-left: -3px;margin-bottom: 8px;">
         </div>
-      </div>
+    </div>
 
-      <script>
+    <script>
         // Get today's date in "Y-m-d" format
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading 0 if month is single digit
         const day = String(today.getDate()).padStart(2, '0'); // Add leading 0 if day is single digit
         const formattedDate = `${year}-${month}-${day}`;
-    
+
         document.getElementById("current-date").innerHTML += formattedDate;
-      </script>
-    
+    </script>
+
     <div class="sidebar" id="sidebar">
         <div class="pos-name">
             <h2>POS System</h2>
         </div>
         <ul>
-            <li><a href="{% url 'staffside:pos' %}" class="nav-link {% if request.path == '/staffside/pos/' %}active{% endif %}">
-                <i class="fa-solid fa-cash-register"></i><span> POS</span></a>
+            <li><a href="{% url 'staffside:pos' %}"
+                    class="nav-link {% if request.path == '/staffside/pos/' %}active{% endif %}">
+                    <i class="fa-solid fa-cash-register"></i><span> POS</span></a>
             </li>
-            <li><a href="{% url 'staffside:orders' %}" class="nav-link {% if request.path == '/staffside/orders/' %}active{% endif %}">
-                <i class="fa-solid fa-receipt"></i><span> Orders</span></a>
+            <li><a href="{% url 'staffside:orders' %}"
+                    class="nav-link {% if request.path == '/staffside/orders/' %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i><span> Orders</span></a>
             </li>
-            <li><a href="{% url 'staffside:tables' %}" class="nav-link {% if request.path == '/staffside/tables/' %}active{% endif %}">
-                <i class="fa-solid fa-table"></i><span> Tables</span></a>
+            <li><a href="{% url 'staffside:tables' %}"
+                    class="nav-link {% if request.path == '/staffside/tables/' %}active{% endif %}">
+                    <i class="fa-solid fa-table"></i><span> Tables</span></a>
             </li>
-            <li><a href="{% url 'staffside:sales' %}" class="nav-link {% if request.path == '/staffside/sales/' %}active{% endif %}">
-                <i class="fa-solid fa-chart-line"></i><span> Sales</span></a>
+            <li><a href="{% url 'staffside:sales' %}"
+                    class="nav-link {% if request.path == '/staffside/sales/' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i><span> Sales</span></a>
             </li>
-            <li><a href="{% url 'staffside:customer' %}" class="nav-link {% if request.path == '/staffside/customer/' %}active{% endif %}">
-                <i class="fa fa-user"></i><span> Customer</span></a>
+            <li><a href="{% url 'staffside:customer' %}"
+                    class="nav-link {% if request.path == '/staffside/customer/' %}active{% endif %}">
+                    <i class="fa fa-user"></i><span> Customer</span></a>
             </li>
-            <li><a href="{% url 'staffside:settings' %}" class="nav-link {% if request.path == '/staffside/settings/' %}active{% endif %}">
-                <i class="fa fa-cogs"></i><span> Settings</span></a>
+            <li><a href="{% url 'staffside:settings' %}"
+                    class="nav-link {% if request.path == '/staffside/settings/' %}active{% endif %}">
+                    <i class="fa fa-cogs"></i><span> Settings</span></a>
             </li>
-            <li><a href="{% url 'accounts:logoutaccount' %}" class="nav-link {% if request.path == '/staffside/logout/' %}active{% endif %}">
-                <i class="fa fa-sign-out"></i><span> Logout</span></a>
+            <li><a href="{% url 'accounts:logoutaccount' %}"
+                    class="nav-link {% if request.path == '/staffside/logout/' %}active{% endif %}">
+                    <i class="fa fa-sign-out"></i><span> Logout</span></a>
             </li>
         </ul>
     </div>
-    
+
     <div class="content" id="content-area">
         {% include template %}
-    </div>    
+    </div>
 </body>
+
 </html>
