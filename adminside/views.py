@@ -25,7 +25,7 @@ from django.db.models.functions import TruncMonth # type: ignore
 
 def render_page(request, template, data=None):
     today = timezone.now().date()
-    
+
     context = {
         "template": template,
         "user": request.user,
@@ -47,8 +47,8 @@ def render_page(request, template, data=None):
         context["has_unseen"] = unseen_notifications.exists()
         context["unseen_notifications"] = unseen_notifications 
 
-        # If notifications dropdown is opened, mark unseen notifications as seen
-        if context["open_notifications"]:
+        # Only mark as seen when user explicitly triggers the action
+        if "mark_seen" in request.GET:
             NotificationSeen.objects.bulk_create([
                 NotificationSeen(user=request.user, notification=n, seen=True)
                 for n in unseen_notifications
@@ -455,7 +455,6 @@ def inventory(request):
             msg = "New inventory item added successfully."
 
         if form.is_valid():
-            print("hello")
             form.save()
             messages.success(request, msg)
             return redirect("adminside:inventory")
@@ -506,7 +505,6 @@ def customer(request):
     customers = Customer.objects.all()
 
     if request.method == 'POST':
-        print("Received POST request with data:", request.POST) 
 
         if 'delete_customer_id' in request.POST:  
             customer_id = request.POST.get('delete_customer_id')

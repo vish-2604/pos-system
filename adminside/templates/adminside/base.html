@@ -130,11 +130,18 @@
           let dropdown = document.getElementById("notificationDropdown");
           let dot = document.getElementById("notification-dot");
 
+          // If notifications are unseen, mark them as seen and keep dropdown open
+          if (dot) {
+            dot.remove();
+            let newUrl = window.location.href.includes("?") ? window.location.href + "&mark_seen=true" : "?mark_seen=true";
+            history.replaceState(null, null, newUrl); // Update URL without reloading
+          }
+
+          // Toggle the dropdown open/close behavior
           if (dropdown.style.display === "block") {
             dropdown.style.display = "none"; // Close dropdown on second click
           } else {
             dropdown.style.display = "block"; // Open dropdown on first click
-            dot?.remove(); // Hide orange dot when opening
           }
         }
 
@@ -148,7 +155,6 @@
           }
         });
       </script>
-
 
 
       <span id="current-date">{{ user.username }}<br /></span>

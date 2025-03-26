@@ -32,7 +32,7 @@ from django.http import JsonResponse # type: ignore
 
 def render_page(request, template, data=None):
     today = timezone.now().date()
-    
+
     context = {
         "template": template,
         "user": request.user,
@@ -54,8 +54,8 @@ def render_page(request, template, data=None):
         context["has_unseen"] = unseen_notifications.exists()
         context["unseen_notifications"] = unseen_notifications 
 
-        # If notifications dropdown is opened, mark unseen notifications as seen
-        if context["open_notifications"]:
+        # Only mark as seen when user explicitly triggers the action
+        if "mark_seen" in request.GET:
             NotificationSeen.objects.bulk_create([
                 NotificationSeen(user=request.user, notification=n, seen=True)
                 for n in unseen_notifications
@@ -69,6 +69,7 @@ def render_page(request, template, data=None):
         context.update(data)
 
     return render(request, "staffside/base.html", context)
+
 
 def home(request):
     messages.success(request, "✅ Login successful!")  

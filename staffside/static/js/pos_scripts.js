@@ -241,3 +241,4 @@ function reloadWithTable(selectElement) {
 document.getElementById('search-input').addEventListener('input', function() {
     this.form.submit();  // Submit the form automatically as the user types
 });
+

@@ -184,7 +184,7 @@ def get_default_supplier():
 
 class Purchase(models.Model):
     purchase_id = models.AutoField(primary_key=True)
-    food_item = models.CharField(max_length=50)
+    food_item = models.CharField(max_length=100)
     quantity = models.PositiveIntegerField(default=1)  # Added quantity field
     cost_price = models.IntegerField(null=False)
     supplier = models.ForeignKey("Supplier", on_delete=models.SET_NULL, null=True, blank=True)
@@ -207,10 +207,11 @@ class Categories(models.Model):
 
     def __str__(self):
         return f"{self.categories_name} - {'On' if self.status else 'Off'}"
+    
 class FoodItem(models.Model):
     id = models.AutoField(primary_key=True)
     image = models.ImageField(blank=True, null=True)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=100)
     category = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
     price = models.IntegerField(null=False)
     description = models.TextField(max_length=100)
@@ -275,7 +276,7 @@ class Inventory(models.Model):
                     'price': self.price,
                     'category': self.category,
                     'description': self.description,
-                    'is_special': True if self.price > 500 else False,
+                    'is_special': True if self.price > 270 else False,
                     'quantity': self.quantity,  
                 }
             )

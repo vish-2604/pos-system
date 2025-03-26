@@ -86,7 +86,7 @@
                             <p class="card-text"
                                 style="font-size: 12px; display: flex; justify-content: space-between;">
                                 <span>Small</span>
-                                <span>₹{{ item.price|percentage:"-20" }}</span>
+                                <span>₹{{ item.price|percentage:"-10" }}</span>
                             </p>
                             <p class="card-text"
                                 style="font-size: 12px; display: flex; justify-content: space-between;">
@@ -96,7 +96,7 @@
                             <p class="card-text"
                                 style="font-size: 12px; display: flex; justify-content: space-between;">
                                 <span>Large</span>
-                                <span>₹{{ item.price|percentage:"20" }}</span>
+                                <span>₹{{ item.price|percentage:"10" }}</span>
                             </p>
 
                             <!-- Size Selection -->
@@ -265,5 +265,22 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+    function adjustCartHeight() {
+        let foodSectionHeight = $(".left-section").outerHeight();
+        $(".cart-container").css("height", foodSectionHeight + "px");
+    }
+
+    // Adjust height on page load
+    adjustCartHeight();
+
+    // Adjust height when items are added/removed from cart
+    $(document).on("click", ".add-to-cart-button, .btn-outline-secondary, .fa-xmark", function () {
+        setTimeout(adjustCartHeight, 500); // Delay to ensure height update after cart updates
+    });
+});
+
+</script>
 
 <script src="{% static 'js/pos_scripts.js' %}"></script>
