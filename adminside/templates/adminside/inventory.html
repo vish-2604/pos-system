@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{% static 'css/inventory_style.css' %}" />
 {% endblock %}
 
+
 <div class="food-items-page">
   <div class="food-item-title mt-4">
     <h3>INVENTORY</h3>
@@ -30,6 +31,16 @@
       </span>
       <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
     </button>
+
+    <form id="csvUploadForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" id="csvFileInput" name="csv_file" accept=".csv" style="display: none;">
+      <button type="button" class="csv-upload-button" onclick="document.getElementById('csvFileInput').click()">
+        <i class="fa-solid fa-file-csv"></i> <span class="btn-text">Add CSV</span>
+    </button>    
+      <button type="submit" id="uploadCsvBtn" style="display: none;">Upload</button>
+    </form>
+    
   </div>
 
   <div class="overlay" id="overlay" onclick="closeForm()"></div>

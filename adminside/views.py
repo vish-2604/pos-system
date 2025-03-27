@@ -21,6 +21,9 @@ from django.db.models import Sum, Count # type: ignore
 from datetime import datetime, timedelta
 import random
 from django.db.models.functions import TruncMonth # type: ignore
+import re
+import csv
+from django.http import JsonResponse # type: ignore
 
 
 def render_page(request, template, data=None):
@@ -221,8 +224,6 @@ def dashboard(request):
 
     return render_page(request, 'adminside/dashboard.html', context)
 
-
-
 # Staff View
 def staff(request):
     branches = Branch.objects.all()
@@ -344,13 +345,74 @@ def suppliers(request):
         form =SupplierForm()
     return render_page(request, 'adminside/suppliers.html',{"supplier_members":supplier_members,"form":form})
 
+
+
+
+
 def purchase(request):  
     purchase_items = Purchase.objects.all() 
     suppliers = Supplier.objects.all() 
     branches = Branch.objects.all()
     
     if request.method == 'POST':
+        if 'csv_file' in request.FILES:  # Handle CSV Upload
+            csv_file = request.FILES['csv_file']
+            
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, "Invalid file format. Please upload a CSV file.")
+                return redirect('adminside:purchase')
 
+            try:
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
+                for row in reader:
+                    row = {key.strip(): value.strip() for key, value in row.items() if key.strip()}  # Remove empty column keys
+
+
+                    if not any(row.values()):  # Ignore completely empty rows
+                        continue
+
+                    supplier_data = row['Supplier'].split(' - ') 
+                    supplier_name = supplier_data[0].strip() 
+                    company_name = supplier_data[1].strip() if len(supplier_data) > 1 else None  
+
+                    supplier = Supplier.objects.filter(supplier_name__iexact=supplier_name, company_name__iexact=company_name).first()
+
+                    # Extract location and area from CSV
+                    csv_value = row['Branch'].strip()  
+                    csv_value = re.sub(r'\s*-\s*', ' - ', csv_value)  
+
+                    if " - " in csv_value:
+                        csv_location, csv_area = csv_value.split(" - ", 1)
+                    else:
+                        csv_location = csv_value
+                        csv_area = None
+
+                    branch = Branch.objects.filter(location__iexact=csv_location, area__iexact=csv_area).first()
+
+                    if supplier and branch:
+                        Purchase.objects.create(
+                            food_item=row['Food Item'],
+                            quantity=int(row['Quantity']),
+                            cost_price=float(row['Cost Price']),
+                            supplier=supplier,
+                            branch=branch,
+                            purchased_date=row['Purchase Date'],
+                            payment_status=row['Payment Status']
+                        )
+                        messages.success(request, f"CSV added successfully ")
+                    else:
+                        print("Invalid Row:", row)  # Debugging
+                        messages.error(request, f"Invalid supplier or branch in CSV row: {row}")
+                        return redirect('adminside:purchase')
+
+            except Exception as e:
+                print(e)
+                messages.error(request, f"Error processing CSV file: {str(e)}")
+            
+            return redirect('adminside:purchase')
+
+        # Handle purchase deletion
         delete_id = request.POST.get('delete_purchase_id')
         if delete_id:
             purchase = get_object_or_404(Purchase, purchase_id=int(delete_id))
@@ -358,8 +420,8 @@ def purchase(request):
             messages.success(request, f"{purchase.food_item} deleted successfully!")
             return redirect('adminside:purchase')
 
+        # Handle purchase form submission
         purchase_id = request.POST.get('purchase_id')
-
         if purchase_id and purchase_id.isdigit():  
             try:
                 purchase = Purchase.objects.get(purchase_id=int(purchase_id))
@@ -386,9 +448,10 @@ def purchase(request):
     return render_page(request, 'adminside/purchase.html', {
         "purchase_items": purchase_items, 
         "suppliers": suppliers, 
-        "branches":branches,
+        "branches": branches,
         "form": form
     })
+
 
 # Categories View
 def categories(request):
@@ -429,7 +492,10 @@ def categories(request):
 
     return render_page(request, 'adminside/categories.html',{"categories":categories,"form":CategoryForm()})
 
-# Inventory View
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
+
 def inventory(request):
     inventory_items = Inventory.objects.all()
     categories = Categories.objects.all()
@@ -443,13 +509,52 @@ def inventory(request):
             messages.success(request, f'Inventory item "{item.purchase.food_item}" deleted successfully.')
             return redirect("adminside:inventory")
 
+        # Handle CSV Upload
+        if "csv_file" in request.FILES:
+            csv_file = request.FILES["csv_file"]
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, "Only CSV files are allowed.")
+                return redirect("adminside:inventory")
+
+            file_path = default_storage.save(f"uploads/{csv_file.name}", ContentFile(csv_file.read()))
+            with open(default_storage.path(file_path), 'r', encoding='utf-8') as file:
+                csv_reader = csv.reader(file)
+                next(csv_reader)  # Skip header row
+
+                for row in csv_reader:
+                    try:
+                        purchase = Purchase.objects.get(purchase_id=row[0])  # Assuming purchase_id in CSV
+                        category = Categories.objects.get(categories_id=row[1])  # Assuming category_id in CSV
+                        description = row[2]
+                        price = int(row[3])
+                        cost = int(row[4])
+                        mfg_date = row[5]
+                        exp_date = row[6]
+                        active = row[7].strip().lower() == "true"
+
+                        Inventory.objects.create(
+                            purchase=purchase,
+                            category=category,
+                            description=description,
+                            price=price,
+                            cost=cost,
+                            mfg_date=mfg_date,
+                            exp_date=exp_date,
+                            active=active,
+                        )
+                    except Exception as e:
+                        price(e)
+                        messages.error(request, f"Error processing row: {row} - {str(e)}")
+
+            messages.success(request, "CSV file uploaded successfully.")
+            return redirect("adminside:inventory")
+
         item_id = request.POST.get("inventory_id")  
-          
-        if item_id: 
+        if item_id:
             item = get_object_or_404(Inventory, id=item_id)
             form = InventoryForm(request.POST, request.FILES, instance=item)
             msg = f'Inventory item "{item.purchase.food_item}" updated successfully.'
-        else: 
+        else:
             form = InventoryForm(request.POST, request.FILES)
             msg = "New inventory item added successfully."
 
@@ -461,7 +566,13 @@ def inventory(request):
             print(form.errors)
             messages.error(request, "Error in form submission. Please check the fields.")
 
-    return render_page(request, 'adminside/inventory.html',{"inventory_items": inventory_items,"categories": categories,"purchase_items":purchase_items,"form":InventoryForm()})
+    return render_page(request, 'adminside/inventory.html', {
+        "inventory_items": inventory_items,
+        "categories": categories,
+        "purchase_items": purchase_items,
+        "form": InventoryForm()
+    })
+
 
 # FoodItem View
 def fooditems(request):

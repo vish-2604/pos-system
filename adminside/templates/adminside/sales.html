@@ -11,12 +11,19 @@
   <div class="staff-title mt-4">
     <h3>SALES</h3>
 
-    <div class="search-container">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search by Order ID" onkeyup="searchTable()" />
-      <button class="search-btn">
+    <div class="search-container" id="searchContainer">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Search by Order ID"
+        onkeyup="searchTable()"
+      />
+      <button class="search-btn" onclick="toggleSearch()">
         <i class="fa fa-search"></i>
       </button>
     </div>
+    
   </div>
 
   <div class="row">

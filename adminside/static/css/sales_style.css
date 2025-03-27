@@ -374,3 +374,46 @@
     background: white;
     cursor: pointer;
   }
+
+
+
+@media (max-width: 600px) {
+  .page-heading {
+    display: none;
+  }
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  position: relative; /* So we can control positioning if needed */
+}
+
+/* The button always stays visible */
+.search-btn {
+  background-color: #F9C784; /* Example */
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.search-input {
+  transition: width 0.3s ease, opacity 0.3s ease;
+  width: 200px;       
+  opacity: 1;        
+}
+
+@media (max-width: 600px) {
+  .search-input {
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.search-container.active .search-input {
+  width: 150px;
+  opacity: 1;
+  pointer-events: auto;
+}

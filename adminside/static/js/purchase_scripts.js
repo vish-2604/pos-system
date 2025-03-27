@@ -187,3 +187,29 @@ function openDeleteModal(purchaseId) {
 function closeDeleteModal() {
   document.getElementById("deleteModal").style.display = "none";
 }
+
+document.getElementById("csvFileInput").addEventListener("change", function () {
+  document.getElementById("uploadCsvBtn").click();
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  let searchBtn = document.querySelector(".search-btn");
+  let searchContainer = document.querySelector(".search-container");
+  let searchInput = document.querySelector(".search-input");
+
+  searchBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      searchContainer.classList.toggle("active");
+
+      if (searchContainer.classList.contains("active")) {
+          searchInput.focus();
+      }
+  });
+
+  // Close search when clicking outside (only if screen width > 415px)
+  document.addEventListener("click", function (event) {
+      if (window.innerWidth > 415 && !searchContainer.contains(event.target)) {
+          searchContainer.classList.remove("active");
+      }
+  });
+});

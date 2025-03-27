@@ -31,6 +31,16 @@
       </span>
       <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
     </button>
+    
+    <!-- CSV Upload Button -->
+    <form id="csvUploadForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" id="csvFileInput" name="csv_file" accept=".csv" style="display: none;">
+      <button type="button" class="csv-upload-button" onclick="document.getElementById('csvFileInput').click()">
+        <i class="fa-solid fa-file-csv"></i> <span class="btn-text">Add CSV</span>
+      </button>
+      <button type="submit" id="uploadCsvBtn" style="display: none;">Upload</button>
+    </form>
   </div>
 
   <div class="overlay" id="overlay" onclick="closeForm()"></div>
@@ -145,21 +155,21 @@
 
               <button type="button" class="delete-btn" onclick="openDeleteModal('{{ purchase.purchase_id }}')">
                 <i class="fas fa-trash"></i>
-            </button>
-            
-            <!-- Delete Confirmation Modal -->
-            <div id="deleteModal" class="modal">
+              </button>
+
+              <!-- Delete Confirmation Modal -->
+              <div id="deleteModal" class="modal">
                 <div class="modal-content">
-                    <p>Are you sure you want to delete this purchase?</p>
-                    <form id="deleteForm" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="delete_purchase_id" id="delete_purchase_id">
-                        <button type="submit" class="confirm-btn">Yes, Delete</button>
-                        <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
-                    </form>
+                  <p>Are you sure you want to delete this purchase?</p>
+                  <form id="deleteForm" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_purchase_id" id="delete_purchase_id">
+                    <button type="submit" class="confirm-btn">Yes, Delete</button>
+                    <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+                  </form>
                 </div>
-            </div>
-            
+              </div>
+
 
             </div>
           </td>
