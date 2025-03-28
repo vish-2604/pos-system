@@ -193,7 +193,7 @@ function closeDeleteModal() {
 document.getElementById("csvFileInput").addEventListener("change", function () {
   let uploadBtn = document.getElementById("uploadCsvBtn");
   if (this.files.length > 0) {
-      uploadBtn.click();  // Automatically submit the form
+      uploadBtn.click();  
   }
 });
 
@@ -212,7 +212,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   });
 
-  // Close search when clicking outside (only if screen width > 415px)
   document.addEventListener("click", function (event) {
       if (window.innerWidth > 415 && !searchContainer.contains(event.target)) {
           searchContainer.classList.remove("active");

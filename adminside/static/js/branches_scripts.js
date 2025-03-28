@@ -1,4 +1,3 @@
-// Toggle search input on small devices
 function toggleSearch() {
   let searchContainer = document.querySelector(".search-container");
   let searchInput = document.querySelector(".search-input");
@@ -9,7 +8,6 @@ function toggleSearch() {
   }
 }
 
-// Search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
   let filter = this.value.toLowerCase();
   let rows = document.querySelectorAll("#storeTableBody tr");
@@ -78,7 +76,7 @@ function validateForm(event) {
   const storeArea = document.getElementById("storeArea").value.trim();
   const phone = document.getElementById("PhoneNo").value.trim();
   const isActive = document.getElementById("is_active").value;
-  const managerID = document.getElementById("managerID").value.trim(); // Capture manager ID
+  const managerID = document.getElementById("managerID").value.trim(); 
 
   if (location === "") {
     showError("location", "Location is required");
@@ -144,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
       let row = this.closest("tr");
 
       let branchData = {
-        id: row.children[0].textContent.trim(),  // Fetch Branch ID
+        id: row.children[0].textContent.trim(),  
         location: row.children[1].textContent.trim(),
         area: row.children[2].textContent.trim(),
         manager_id: row.children[3].textContent.trim() !== "No Manager" ? row.children[3].getAttribute("data-manager-id") : "", // Fetch manager's ID from data attribute

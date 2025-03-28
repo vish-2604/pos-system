@@ -138,12 +138,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("date_joined").value = staffData.date_joined;
         document.getElementById("is_active").value = staffData.is_active ? "True" : "False";
 
-        // Ensure the role is selected correctly
         let roleDropdown = document.getElementById("staff_role");
         if (staffData.staff_role) {
             roleDropdown.value = staffData.staff_role;
         } else {
-            roleDropdown.selectedIndex = 0; // Default placeholder
+            roleDropdown.selectedIndex = 0; 
         }
 
         let branchDropdown = document.getElementById("branch");

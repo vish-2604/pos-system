@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function validateForm(event) {
     event.preventDefault();
-    console.log("Validating form..."); // Debugging line
+    console.log("Validating form...");
 
     clearErrors();
     let isValid = true;
@@ -100,7 +100,7 @@ function validateForm(event) {
     }
 
     if (isValid) {
-        console.log("Form submitted! ✅");  // This should print only if form is valid
+        console.log("Form submitted! ✅");
         event.target.submit();
     }
 }

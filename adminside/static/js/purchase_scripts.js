@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function validateForm(event) {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault(); 
     let isValid = true;
 
     let foodItemField = document.getElementById("foodItem");
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let branch = document.getElementById("branch").value;
 
 
-    clearValidationMessages(); // Clear previous messages
+    clearValidationMessages();
 
     if (!foodItemField.value.trim()) {
       showError(foodItemField, "Food Item is required.");
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
         food_item: row.children[1]?.textContent.trim() || "",
         quantity: row.children[2]?.textContent.trim() || "",
         cost_price: row.children[3]?.textContent.trim() || "",
-        supplier_id: row.children[4]?.getAttribute("data-supplier-id") || "", // Ensure supplier ID is set correctly
+        supplier_id: row.children[4]?.getAttribute("data-supplier-id") || "",
         branch: row.children[8].textContent.trim(),
         purchased_date: row.children[6]?.textContent.trim() || "",
         payment_status: row.children[7]?.textContent.trim() || "",
@@ -206,7 +206,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   });
 
-  // Close search when clicking outside (only if screen width > 415px)
   document.addEventListener("click", function (event) {
       if (window.innerWidth > 415 && !searchContainer.contains(event.target)) {
           searchContainer.classList.remove("active");

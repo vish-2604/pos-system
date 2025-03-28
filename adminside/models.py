@@ -259,9 +259,8 @@ class Inventory(models.Model):
             except ObjectDoesNotExist:
                 pass
 
-        # **Out of Stock Handling**
         if self.quantity == 0:
-            self.active = False  # Deactivate when out of stock
+            self.active = False  
             get_notification().objects.create(user=self.purchase.branch.manager,message=f"{self.purchase.food_item} is out of stock!")
 
 

@@ -37,10 +37,8 @@ def render_page(request, template, data=None):
     }
 
     if request.user.is_authenticated:
-        # Get all notifications for today
         all_notifications = Notification.objects.filter(created_at__date=today).order_by("-created_at")
 
-        # Get unseen notifications for the logged-in user
         unseen_notifications = all_notifications.exclude(
             notificationseen__user=request.user,
             notificationseen__seen=True
@@ -50,7 +48,6 @@ def render_page(request, template, data=None):
         context["has_unseen"] = unseen_notifications.exists()
         context["unseen_notifications"] = unseen_notifications 
 
-        # Only mark as seen when user explicitly triggers the action
         if "mark_seen" in request.GET:
             NotificationSeen.objects.bulk_create([
                 NotificationSeen(user=request.user, notification=n, seen=True)
@@ -71,37 +68,31 @@ def home(request):
     messages.success(request, "✅ Login successful!")  
     return redirect("adminside:dashboard")
 
+# Dashboard View
 def dashboard(request):
-    # --- Total Orders ---
     total_orders = Order.objects.count()
 
-    # --- Count Unique Customers (Using 'Table' as Customer Representation) ---
     total_customers = Customer.objects.count()
 
-    # --- Total Sales Revenue ---
     total_sales = Sales.objects.aggregate(total=Sum('order__final_total'))['total'] or 0
 
-    # --- Total Purchases (All-Time) ---
     total_cost = Purchase.objects.aggregate(total_cost=Sum('cost_price'))['total_cost'] or 0
 
-    # --- Profit Calculation (All-Time) ---
     total_profit = total_sales - total_cost
 
 
     
-    # --- Weekly Sales (If Needed) ---
     last_week = datetime.today() - timedelta(days=7)
     weekly_sales = (
         Sales.objects.filter(date__gte=last_week)
         .aggregate(total=Sum('order__final_total'))['total'] or 0
     )
 
-    # --- Sales Analytics Data ---
     today = datetime.today()
     last_week = today - timedelta(days=7)
     sales_data = (
         Sales.objects
-        .filter(date__gte=last_week)  # ✅ Use `date` instead of `purchased_date`
+        .filter(date__gte=last_week) 
         .values('date')
         .annotate(total=Sum('order__final_total'))
         .order_by('date')
@@ -110,13 +101,12 @@ def dashboard(request):
     sales_labels = [data['date'].strftime('%Y-%m-%d') for data in sales_data]
     sales_values = [data['total'] for data in sales_data]
 
-    # --- Best Selling Items (Top 5, Grouped by Base Name) ---
     best_selling_items = Order.objects.values_list('ordered_items', flat=True)
     item_count = defaultdict(lambda: {"quantity": 0, "total_price": 0, "image": "", "price": 0})
 
     for items in best_selling_items:
         for item_name, details in items.items():
-            base_name = item_name.split('_')[0]  # Extract base name
+            base_name = item_name.split('_')[0]  
 
             if base_name in item_count:
                 item_count[base_name]["quantity"] += details["quantity"]
@@ -138,15 +128,13 @@ def dashboard(request):
         for item in sorted_items
     ]
 
-    # Monthly Sales Revenue
     monthly_profit_data = (
-        Sales.objects.annotate(month=TruncMonth('date'))  # Extract month from `date`
+        Sales.objects.annotate(month=TruncMonth('date'))  
         .values('month')
         .annotate(revenue=Sum('order__final_total'))
         .order_by('month')
     )
 
-    # Monthly Costs
     monthly_cost_data = (
         Purchase.objects.annotate(month=TruncMonth('purchased_date'))
         .values('month')
@@ -154,24 +142,18 @@ def dashboard(request):
         .order_by('month')
     )
 
-    # Convert Monthly Costs to Dictionary for Quick Lookup
     cost_dict = {data['month']: data['cost'] for data in monthly_cost_data}
 
-    # Compute Monthly Profit (Revenue - Cost)
     profit_trend_labels = [data['month'].strftime('%Y-%m') for data in monthly_profit_data]
     profit_trend_labels = [datetime.strptime(label, "%Y-%m").strftime("%B") for label in profit_trend_labels]
     profit_trend_values = [data['revenue'] - cost_dict.get(data['month'], 0) for data in monthly_profit_data]
 
-    # --- Category Sales Calculation ---
     all_categories = list(Categories.objects.values_list('categories_name', flat=True))
 
-    # Initialize category_totals (No "Others" category)
     category_totals = {category: 0 for category in all_categories}
 
-    # Get sales data by category
     category_sales = Sales.objects.filter(order__ordered_items__isnull=False).values('order__ordered_items')
 
-    # Process each sale
     for sale in category_sales:
         ordered_items = sale["order__ordered_items"]
         
@@ -201,7 +183,6 @@ def dashboard(request):
     bar_colors = generate_bar_colors(len(profit_trend_values))
 
 
-    # --- Final Context Update ---
     context = {
         'total_orders': total_orders,
         'total_customers': total_customers,
@@ -509,7 +490,6 @@ def inventory(request):
             messages.success(request, f'Inventory item "{item.purchase.food_item}" deleted successfully.')
             return redirect("adminside:inventory")
 
-        # Handle CSV Upload
         if "csv_file" in request.FILES:
             csv_file = request.FILES["csv_file"]
             if not csv_file.name.endswith('.csv'):
@@ -523,8 +503,8 @@ def inventory(request):
 
                 for row in csv_reader:
                     try:
-                        purchase = Purchase.objects.get(purchase_id=row[0])  # Assuming purchase_id in CSV
-                        category = Categories.objects.get(categories_id=row[1])  # Assuming category_id in CSV
+                        purchase = Purchase.objects.get(purchase_id=row[0]) 
+                        category = Categories.objects.get(categories_id=row[1])  
                         description = row[2]
                         price = int(row[3])
                         cost = int(row[4])
@@ -589,7 +569,6 @@ def tables(request):
         seats = request.POST.get("seats")
 
         if table_id:
-            # Extract only numeric part (e.g., "T-2" -> "2")
             table_id = "".join(filter(str.isdigit, table_id))
 
         if table_id and status:
@@ -647,7 +626,7 @@ def customer(request):
     return render_page(request, 'adminside/customer.html', {"customers": customers, "form": form})
 
 def reports(request):
-    filter_type = request.GET.get('filter', 'all')  # Default to "all"
+    filter_type = request.GET.get('filter', 'all')  
 
     today = date.today()
     if filter_type == 'today':
@@ -662,12 +641,12 @@ def reports(request):
     else:  
         sales_data = Sales.objects.all()
 
-    sales_data = sales_data.select_related('order__branch')  # ✅ Fix here
+    sales_data = sales_data.select_related('order__branch')  
 
     grouped_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {'quantity': 0, 'image': None})))
     for sale in sales_data:
         sale_date = sale.date.strftime('%Y-%m-%d')
-        branch_name = sale.order.branch.location  # ✅ Access branch via order
+        branch_name = sale.order.branch.location 
         order_items = sale.order.ordered_items  
         image_urls = sale.order.image_urls  
 
@@ -707,7 +686,7 @@ def reports(request):
 
 
 def sales(request):
-    filter_type = request.GET.get('filter', '')  # Get the filter type from request
+    filter_type = request.GET.get('filter', '') 
     today = now().date()
 
     if filter_type == "today":
@@ -717,9 +696,8 @@ def sales(request):
     elif filter_type == "yearly":
         sales_data = Sales.objects.filter(date__year=today.year)
     else:
-        sales_data = Sales.objects.all()  # Show all sales if no filter is applied
+        sales_data = Sales.objects.all()  
 
-    # Prepare data f or template
     sales_list = []
     for sale in sales_data:
         sales_list.append({
@@ -743,7 +721,7 @@ def render_settings_page(request, template, context=None):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, template, context or {})
     context = context or {}
-    context["template"] = template  # Ensures `template` is still passed
+    context["template"] = template
     return render(request, "adminside/settings.html", context)
 
 # Profile View

@@ -50,21 +50,17 @@
     .notifications-dropdown {
       display: none;
       position: absolute;
-      width: 250px;
-      /* Adjust width */
-      height: auto;
-      /* Allow dynamic height */
-      max-height: 300px;
-      /* Prevent it from getting too long */
+      width: 280px;
+      max-height: 250px;
       background: white;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 15px;
+      padding: 10px;
       border-radius: 8px;
       right: 10px;
       top: 50px;
       z-index: 1000;
       overflow-y: auto;
-      /* Enables scrolling if content overflows */
+      white-space: normal;
     }
 
     .notifications-dropdown h4 {
@@ -88,8 +84,38 @@
     .notifications-dropdown ul li:last-child {
       border-bottom: none;
     }
+
+    @media (max-width: 530px) {
+      .notifications-dropdown {
+        width: 90%;
+        right: 5%;
+        left: auto;
+        max-height: 200px;
+        top: 45px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .notifications-dropdown {
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        max-height: 200px;
+        top: 45px;
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 320px) {
+      .notifications-dropdown {
+        width: 100%;
+        left: 0;
+        transform: none;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
   </style>
-  <!-- google fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
@@ -130,22 +156,16 @@
           let dropdown = document.getElementById("notificationDropdown");
           let dot = document.getElementById("notification-dot");
 
-          // If notifications are unseen, mark them as seen and keep dropdown open
           if (dot) {
             dot.remove();
             let newUrl = window.location.href.includes("?") ? window.location.href + "&mark_seen=true" : "?mark_seen=true";
             history.replaceState(null, null, newUrl); // Update URL without reloading
           }
+          dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+          dropdown.style.width = "250px"; // Ensures proper width
 
-          // Toggle the dropdown open/close behavior
-          if (dropdown.style.display === "block") {
-            dropdown.style.display = "none"; // Close dropdown on second click
-          } else {
-            dropdown.style.display = "block"; // Open dropdown on first click
-          }
+
         }
-
-        // Close dropdown when clicking outside
         document.addEventListener("click", function (event) {
           let dropdown = document.getElementById("notificationDropdown");
           let bell = document.querySelector(".notification-link");

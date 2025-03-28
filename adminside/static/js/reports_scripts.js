@@ -1,12 +1,11 @@
 function filterReports() {
   let filterValue = document.getElementById("incomeDropdown").value;
-  window.location.href = `?filter=${filterValue}`;  // Reload with query param
+  window.location.href = `?filter=${filterValue}`;  
 }
 
-// Set the selected filter when the page loads
 document.addEventListener("DOMContentLoaded", function() {
   let params = new URLSearchParams(window.location.search);
-  let filterValue = params.get("filter") || "all";  // Default to "all"
+  let filterValue = params.get("filter") || "all";  
   document.getElementById("incomeDropdown").value = filterValue;
 });
 

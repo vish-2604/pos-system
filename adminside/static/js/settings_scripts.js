@@ -4,11 +4,9 @@ document.addEventListener("DOMContentLoaded", function() {
         button.addEventListener("click", function() {
             let invoiceNo = this.dataset.invoice;
             
-            // Fetch order details from Django backend
             fetch(`/get_payment_details/${invoiceNo}/`)
             .then(response => response.json())
             .then(data => {
-                // Populate modal with fetched data
                 document.getElementById("modal-invoice").innerText = data.invoice_no;
                 document.getElementById("modal-fullname").innerText = data.full_name;
                 document.getElementById("modal-phone").innerText = data.phone;
@@ -18,7 +16,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById("modal-balance").innerText = data.balance;
                 document.getElementById("modal-date").innerText = data.date;
                 
-                // Show the modal
                 let paymentModal = new bootstrap.Modal(document.getElementById("paymentModal"));
                 paymentModal.show();
             })
@@ -26,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Handle Pay Now button click
     document.getElementById("pay-now-btn").addEventListener("click", function() {
         let invoiceNo = document.getElementById("modal-invoice").innerText;
         let amount = document.getElementById("payment-amount").value;
@@ -48,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             if (data.success) {
                 alert("Payment Successful!");
-                location.reload(); // Reload page to update table
+                location.reload(); 
             } else {
                 alert("Payment Failed: " + data.message);
             }

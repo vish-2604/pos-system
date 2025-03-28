@@ -126,7 +126,7 @@ function validateForm(event) {
 
   if (isValid) {
     console.log("Submitting form...");
-    document.getElementById("customerForm").submit(); // ✅ Submit the form
+    document.getElementById("customerForm").submit(); 
   }
 }
 

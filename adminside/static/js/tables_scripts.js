@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Select all table cards, not just vacant ones
   document.querySelectorAll(".table-card").forEach((table) => {
     table.addEventListener("click", function () {
       openTableModal(this);
@@ -49,15 +48,13 @@ function openTableModal(element) {
   let tableId = element.getAttribute("data-table-number");
   let currentStatus = element.getAttribute("data-status");
 
-  // Prevent modal from opening if the table is occupied
   if (currentStatus === "occupied") {
     return;
   }
 
-  // Extract only the numeric part (e.g., "T-2" → "2")
   tableId = tableId.replace(/\D/g, "");
 
-  document.getElementById("table_id").value = tableId; // Now it's a number
+  document.getElementById("table_id").value = tableId; 
   document.getElementById("reservedToggle").checked = (currentStatus === "reserved");
 
   var tableModal = new bootstrap.Modal(document.getElementById("tableModal"));

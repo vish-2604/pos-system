@@ -99,7 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
   
-    // Close search when clicking outside (only if screen width > 415px)
     document.addEventListener("click", function (event) {
         if (window.innerWidth > 415 && !searchContainer.contains(event.target)) {
             searchContainer.classList.remove("active");

@@ -25,14 +25,12 @@
         </div>
     </div>
 
-    <!-- Top Metrics -->
     <div class="row">
-        <!-- Total Orders -->
         <div class="col-md-4">
             <div class="card p-3 dashboard-card">
                 <div class="d-flex align-items-center">
                     <div class="icon-box">
-                        <i class="fas fa-concierge-bell"></i><!-- ✅ Order Icon -->
+                        <i class="fas fa-concierge-bell"></i>
                     </div>
                     <div class="ms-3">
                         <h5>Total Orders</h5>
@@ -45,12 +43,11 @@
             </div>
         </div>
 
-        <!-- Total Customers -->
         <div class="col-md-4">
             <div class="card p-3 dashboard-card">
                 <div class="d-flex align-items-center">
                     <div class="icon-box">
-                        <i class="fas fa-users"></i> <!-- ✅ Customers Icon -->
+                        <i class="fas fa-users"></i> 
                     </div>
                     <div class="ms-3">
                         <h5>Total Customers</h5>
@@ -63,16 +60,15 @@
             </div>
         </div>
 
-        <!-- Total Sales -->
         <div class="col-md-4">
             <div class="card p-3 dashboard-card">
                 <div class="d-flex align-items-center">
                     <div class="icon-box">
-                        <i class="fas fa-chart-line"></i> <!-- ✅ Sales Icon -->
+                        <i class="fas fa-chart-line"></i> 
                     </div>
                     <div class="ms-3">
                         <h5>Total Sales</h5>
-                        <h3>₹ {{ total_sales|floatformat:2 }}</h3> <!-- ✅ Formatted Sales -->
+                        <h3>₹ {{ total_sales|floatformat:2 }}</h3> 
                         <div class="progress">
                             <div class="progress-bar custom-progress" style="width: 80%;"></div>
                         </div>
@@ -93,7 +89,6 @@
             width: 50px;
             height: 50px;
             background: #4E598C;
-            /* ✅ Icon Background */
             color: white;
             display: flex;
             align-items: center;
@@ -111,15 +106,12 @@
 
         .custom-progress {
             background-color: #FF8C42 !important;
-            /* ✅ Custom Progress Bar Color */
             border-radius: 5px;
         }
     </style>
 
 
-    <!-- Sales Analytics and Best Selling Items -->
     <div class="row mt-4 d-flex align-items-stretch">
-        <!-- Sales Analytics -->
         <div class="col-md-8">
             <div class="card p-4 sales-analytics h-100">
                 <h5>Sales Analytics</h5>
@@ -136,13 +128,13 @@
                     data: {
                         labels: {{ sales_labels| safe }},
                 datasets: [{
-                    label: "Sales (₹)", /* ✅ Title centered inside chart */
+                    label: "Sales (₹)", 
                     data: {{ sales_values| safe }},
-                borderColor: "#4E598C",  /* ✅ Dark blue line */
-                backgroundColor: "rgba(78, 89, 140, 0.2)", /* ✅ Light blue fill */
+                borderColor: "#4E598C",  
+                backgroundColor: "rgba(78, 89, 140, 0.2)", 
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4  /* ✅ Smooth wavy effect */
+                tension: 0.4  
                         }]
                     },
                 options: {
@@ -151,19 +143,19 @@
                 scales: {
                     x: {
                         ticks: {
-                            font: { size: 14 }, /* ❌ Removed bold */
+                            font: { size: 14 }, 
                             color: "#000"
                         }
                     },
                     y: {
                         beginAtZero: true,
-                        ticks: { font: { size: 14 } } /* ✅ Y-axis remains bold */
+                        ticks: { font: { size: 14 } } 
                     }
                 },
                 plugins: {
                     legend: {
                         display: true,
-                        position: "top", /* ✅ Label ("Sales $") centered */
+                        position: "top", 
                         labels: {
                             font: { size: 14 }
                         }
@@ -174,7 +166,6 @@
             });
         </script>
 
-        <!-- Best Selling Items -->
         <div class="col-md-4">
             <div class="card p-3 best-selling h-100">
                 <h5 class="mt-2">Best Selling Items</h5>
@@ -197,7 +188,6 @@
     </div>
 
     <div class="row mt-4">
-        <!-- Total Income Pie Chart (Smaller width) -->
         <div class="col-md-3">
             <div class="card p-3 h-100 d-flex flex-column">
                 <h5>Total Income Distribution</h5>
@@ -207,7 +197,6 @@
             </div>
         </div>
 
-        <!-- Profit & Loss Analysis (Smaller width) -->
         <div class="col-md-3">
             <div class="card p-3 h-100 d-flex flex-column">
                 <h5>Profit & Loss Analysis</h5>
@@ -216,7 +205,6 @@
                     <p class="mb-2">
                         <strong>
                             <i class="fas fa-dollar-sign" style="color: #FF8C42; margin-right: 8px;"></i>
-                            <!-- Added margin for space -->
                             Net Profit:
                         </strong>
                         ₹{{ total_profit }}
@@ -253,7 +241,6 @@
             </div>
         </div>
 
-        <!-- Profit Trend Bar Chart (Larger width) -->
         <div class="col-md-6">
             <div class="card p-4 h-100 d-flex flex-column">
                 <h5>Profit Trend</h5>
@@ -287,22 +274,21 @@
                     plugins: {
                         legend: {
                             display: true,
-                            position: "top",  // Legend at the top inside div
-                            align: "end",  // Moves it towards right
+                            position: "top", 
+                            align: "end",  
                             labels: {
-                                boxWidth: 10,  // Small color box
-                                usePointStyle: true,  // Circular icons
-                                font: { size: 10 },  // Smaller font
+                                boxWidth: 10,  
+                                usePointStyle: true,  
+                                font: { size: 10 },  
                             }
                         }
                     },
                     layout: {
-                        padding: 10,  // Keeps spacing clean
+                        padding: 10,  
                     }
                 }
             });
 
-            // Profit Trend Bar Chart
             var ctxBar = document.getElementById("profitChart").getContext("2d");
             new Chart(ctxBar, {
                 type: "bar",
@@ -311,7 +297,7 @@
                 datasets: [{
                     label: "Profit",
                     data: {{ profit_trend_values| safe }},
-                backgroundColor: "#4CAF50" // Green for positive profit
+                backgroundColor: "#4CAF50" 
                             }],
                         },
                 options: {
