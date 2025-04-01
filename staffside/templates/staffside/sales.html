@@ -64,6 +64,7 @@
                         <th>Payment Method</th>
                         <th>Date</th>
                         <th>Time</th>
+                        <th>Rating</th>  
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -78,7 +79,14 @@
                         <td>{{ sale.date }}</td>
                         <td>{{ sale.time }}</td>
                         <td>
-                            <a class="btn receipte-btn"  style="background-color: #4E598C;" href="{% url 'staffside:print_bill' sale.sales_id %}">
+                            {% if sale.rating %}
+                                ⭐ {{ sale.rating.rating }}/5
+                            {% else %}
+                                <span style="color: gray;">Not Rated</span>
+                            {% endif %}
+                        </td>                
+                        <td>
+                            <a class="btn receipte-btn"  style="background-color: #4E598C;color: white;" href="{% url 'staffside:print_bill' sale.sales_id %}">
                                 Reprint Receipt
                             </a>
                             

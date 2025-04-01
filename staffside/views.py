@@ -1,3 +1,4 @@
+from twilio.rest import Client
 from django.shortcuts import render, redirect # type: ignore
 from django.http import HttpResponse # type: ignore
 from .forms import CustomPasswordChangeForm
@@ -7,7 +8,7 @@ from .forms import CustomPasswordChangeForm
 from django.db import connection # type: ignore
 from adminside.models import Customer,Staff,Table,Categories,FoodItem,Inventory
 from .forms import CustomerForm
-from .models import Sales,Order,Notification,NotificationSeen
+from .models import Sales,Order,Notification,NotificationSeen,Rating
 from django.contrib import messages # type: ignore
 from django.utils import timezone # type: ignore
 from django.contrib.auth.decorators import login_required # type: ignore
@@ -28,6 +29,8 @@ from collections import Counter
 import json  # Import JSON to ensure proper deserialization
 import re
 from django.http import JsonResponse # type: ignore
+from django.core.mail import send_mail # type: ignore
+
 
 
 def render_page(request, template, data=None):
@@ -382,8 +385,34 @@ def process_payment(request):
     return redirect("staffside:pos")
 
 
+def submit_rating(request, order_id, rating_value):
+    order = get_object_or_404(Sales, order_id=order_id)
+
+    Rating.objects.create(order=order, rating=rating_value)
+    messages.success(request, f"Thank you for rating {rating_value} stars!")
+
+    return redirect("print_bill", sale_id=order.sales_id)
+
+
 def print_bill(request, sale_id):
     sale = Sales.objects.get(sales_id=sale_id)
+
+    rating_submitted = Rating.objects.filter(order=sale).exists()  # Check if already rated
+
+    if request.method == "POST":
+        rating_value = request.POST.get("rating")
+        if rating_value:
+            rating_value = int(rating_value)
+
+            rating, created = Rating.objects.update_or_create(
+                order=sale,  
+                defaults={'rating': rating_value}
+            )
+            rating_submitted = True
+            messages.success(request, "Thank you for your feedback!")
+            return redirect(request.path) 
+
+
 
     barcode_dir = os.path.join(settings.MEDIA_ROOT, "barcodes")
     os.makedirs(barcode_dir, exist_ok=True)

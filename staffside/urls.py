@@ -8,6 +8,7 @@ urlpatterns = [
     path('place_order/',views.place_order,name='place_order'),
     path('orders/', views.orders, name='orders'),
     path('process_payment/', views.process_payment, name='process_payment'),
+    path('submit-rating/<int:order_id>/<int:rating_value>/', views.submit_rating, name='submit_rating'),
     path('print-bill/<int:sale_id>/', views.print_bill, name='print_bill'),
     path('tables/', views.tables, name='tables'),
     path("add_to_cart/", views.add_to_cart, name="add_to_cart"),
@@ -21,6 +22,7 @@ urlpatterns = [
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path("update-profile-pic/", views.update_profile_pic, name="update_profile_pic"),
     path('change_password/', views.change_password, name='change_password'),
+
 ]
 
 

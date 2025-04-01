@@ -1,0 +1,2 @@
+purchase_id,category_id,description,price,cost,mfg_date,exp_date,active
+38,18,Sample Item,100,50,2025-03-01,2026-03-01,True

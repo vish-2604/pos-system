@@ -80,3 +80,10 @@ class NotificationSeen(models.Model):
         return f"{self.user.username} - Seen: {self.seen}"
 
     
+class Rating(models.Model):
+    order = models.OneToOneField(Sales, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Rating {self.rating} for Order {self.order.order_id}"

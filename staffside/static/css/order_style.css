@@ -151,12 +151,12 @@ td:nth-child(2), td:nth-child(3) {
 }
 
 
-.button-container {
+/* .button-container {
     display: flex;
-    justify-content: flex-end; /* Align to the right */
-    gap: 10px; /* Space between buttons */
+    justify-content: flex-end; 
+    gap: 10px;
     margin-top: 15px;
-    padding-right: 20px; /* Adjust right spacing */
+    padding-right: 20px; 
 }
 
 .button-container .btn {
@@ -168,15 +168,15 @@ td:nth-child(2), td:nth-child(3) {
 
 @media screen and (max-width: 768px) {
     .button-container {
-        justify-content: center; /* Center on smaller screens */
-        flex-direction: column; /* Stack buttons */
+        justify-content: center;
+        flex-direction: column;
         align-items: center;
         padding-right: 0;
     }
 
     .button-container .btn {
         width: 100%;
-        max-width: 250px; /* Limit button width */
+        max-width: 250px;
     }
 }
 
@@ -189,7 +189,7 @@ td:nth-child(2), td:nth-child(3) {
     border-radius: 5px;
     background-color: #4E598C;
     color: white;
-    width: 150px; /* Set a fixed width for consistency */
+    width: 150px;
 }
 
 
@@ -199,19 +199,18 @@ td:nth-child(2), td:nth-child(3) {
     opacity: 0.8;
 }
 
-/* Ensure the parent container has relative positioning */
 .print-receipt {
     position: relative;
-    width: 60%; /* Adjust width as needed */
+    width: 60%;
     margin: auto;
 }
 
 
 @media screen and (max-width: 600px) {
     .print-receipt {
-        width: 100%; /* Full width for smaller screens */
-        padding: 10px; /* Add some padding */
-        font-size: 14px; /* Adjust font size */
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
     }
 
     table {
@@ -219,7 +218,7 @@ td:nth-child(2), td:nth-child(3) {
     }
 
     table th, table td {
-        font-size: 12px; /* Reduce table font size */
+        font-size: 12px; 
         padding: 5px;
     }
 
@@ -232,8 +231,8 @@ td:nth-child(2), td:nth-child(3) {
     }
 
     .barcode img {
-        width: 80%; /* Make barcode responsive */
-        max-width: 200px; /* Set max size */
+        width: 80%; 
+        max-width: 200px;
     }
 
     .button-container {
@@ -243,7 +242,7 @@ td:nth-child(2), td:nth-child(3) {
     }
 
     .button-container .btn {
-        width: 100%; /* Full-width buttons on small screens */
+        width: 100%; 
         margin-top: 5px;
     }
 }
@@ -267,7 +266,7 @@ td:nth-child(2), td:nth-child(3) {
     }
 
     .print-receipt {
-        width: 80mm; /* Standard receipt width */
+        width: 80mm; 
         max-width: 100%;
         text-align: center;
         margin: auto;
@@ -275,6 +274,106 @@ td:nth-child(2), td:nth-child(3) {
     }
 
     .button-container {
-        display: none; /* Hide buttons when printing */
+        display: none; 
+    }
+} */
+
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #4E598C;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.modal {
+    display: none;  
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    text-align: center;
+}
+
+/* Close Button */
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+
+/* Stars */
+.stars {
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.star {
+    color: black;
+}
+
+.star:hover {
+    color: gold;
+}
+
+@media print {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    body * {
+        visibility: hidden;
+    }
+
+    .print-receipt, .print-receipt * {
+        visibility: visible;
+    }
+
+    .print-receipt {
+        position: relative;
+        width: 80mm; /* Standard receipt width */
+        padding: 15px;
+        border: 2px solid black; /* Black border */
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        background: white;
+        text-align: center;
+    }
+
+    .button-container, .modal, .sidebar, .navbar {
+        display: none !important;
     }
 }
+
+

@@ -18,7 +18,7 @@
     <h2>Coffee Shop</h2>
     <p>Location: {{ sale.order.branch.location }}<br>Tel.: {{ sale.order.branch.phone_no }}</p>
     <hr>
-    <p><strong>Store:</strong> {{ sale.order.branch.branch_id }} &nbsp;&nbsp;&nbsp; {{ sale.order.created_at|date:"d-m-Y H:i A" }}</p>
+    <p><strong>Store:</strong> {{ sale.order.branch.branch_id }} &nbsp;&nbsp;&nbsp; {{sale.order.created_at|date:"d-m-Y H:i A" }}</p>
     <p><strong>Server:</strong> {{ sale.order.staff.staff_role }}</p>
     <p><strong>Survey code:</strong> 0000-2555-2588-4545-69</p>
     <hr>
@@ -34,7 +34,7 @@
         <tbody>
             {% for key, item in sale.order.ordered_items.items %}
             <tr style="font-size: 13px;">
-              <td>{{ key|extract_name }}</td>  <!-- Item name with size -->
+                <td>{{ key|extract_name }}</td> <!-- Item name with size -->
                 <td class="text-end">{{ item.quantity }}</td>
                 <td class="text-end">₹{{ item.price }}</td>
             </tr>
@@ -61,22 +61,95 @@
 <div class="button-container">
     <a href="javascript:history.back()" class="btn">
         <i class="fas fa-arrow-left"></i> Back
-    </a>    
+    </a>
     <button onclick="window.print()" class="btn">
         <i class="fas fa-print"></i> Print
     </button>
+
+    <!-- Rating Button -->
+    <button onclick="openRatingModal()" class="btn">
+        <i class="fas fa-star"></i> Rate Us
+    </button>
 </div>
 
+<!-- Rating Modal -->
+<div id="ratingModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRatingModal()">&times;</span>
+        <h3>Rate Your Experience</h3>
+
+        <!-- Rating Form -->
+        <form id="ratingForm" method="POST" action="">
+            {% csrf_token %}
+            <input type="hidden" id="ratingInput" name="rating" value="">
+            <div class="stars">
+                <span class="star" data-value="1">&#9733;</span>
+                <span class="star" data-value="2">&#9733;</span>
+                <span class="star" data-value="3">&#9733;</span>
+                <span class="star" data-value="4">&#9733;</span>
+                <span class="star" data-value="5">&#9733;</span>
+            </div>
+            <button type="button" onclick="submitRating()" class="btn">Submit Rating</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let stars = document.querySelectorAll(".star");
+        let ratingInput = document.getElementById("ratingInput");
+        let ratingModal = document.getElementById("ratingModal");
+        let selectedRating = 0;
+
+        stars.forEach((star) => {
+            star.addEventListener("click", function () {
+                selectedRating = this.getAttribute("data-value");
+                ratingInput.value = selectedRating;
+
+                stars.forEach((s, i) => {
+                    s.style.color = i < selectedRating ? "gold" : "black";
+                });
+            });
+        });
+
+        window.openRatingModal = function () {
+            document.getElementById("ratingModal").style.display = "flex";  // Open modal
+        };
+
+        window.closeRatingModal = function () {
+            document.getElementById("ratingModal").style.display = "none";  // Close modal
+        };
+
+
+        window.submitRating = function () {
+            if (selectedRating > 0) {
+                document.getElementById("ratingForm").submit();
+            } else {
+                alert("Please select a rating before submitting.");
+            }
+        };
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            if (event.target === ratingModal) {
+                closeRatingModal();
+            }
+        };
+
+        // Close modal when clicking "X"
+        document.querySelector(".close").addEventListener("click", closeRatingModal);
+    });
+</script>
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-  setTimeout(() => {
-      let alerts = document.querySelectorAll(".alert");
-      alerts.forEach(alert => {
-          alert.style.animation = "fadeOut 0.5s forwards";
-          setTimeout(() => alert.remove(), 500);
-      });
-  }, 3000);
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            let alerts = document.querySelectorAll(".alert");
+            alerts.forEach(alert => {
+                alert.style.animation = "fadeOut 0.5s forwards";
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 3000);
+    });
 </script>

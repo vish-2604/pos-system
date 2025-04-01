@@ -486,7 +486,15 @@ def inventory(request):
         if "delete_inventory_id" in request.POST:
             item_id = request.POST.get("delete_inventory_id")
             item = get_object_or_404(Inventory, id=item_id)
+            food_item_name = item.purchase.food_item
+            branch = item.purchase.branch
             item.delete()
+            
+            remaining_inventory = Inventory.objects.filter(purchase__food_item=food_item_name, purchase__branch=branch).count()
+            
+            if remaining_inventory == 0:
+                FoodItem.objects.filter(name=food_item_name, branch=branch).delete()
+
             messages.success(request, f'Inventory item "{item.purchase.food_item}" deleted successfully.')
             return redirect("adminside:inventory")
 
@@ -646,7 +654,7 @@ def reports(request):
     grouped_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {'quantity': 0, 'image': None})))
     for sale in sales_data:
         sale_date = sale.date.strftime('%Y-%m-%d')
-        branch_name = sale.order.branch.location 
+        branch_name = f'{sale.order.branch.location} - {sale.order.branch.area}',
         order_items = sale.order.ordered_items  
         image_urls = sale.order.image_urls  
 
@@ -705,7 +713,7 @@ def sales(request):
             "order_id": sale.order.order_id if sale.order else "N/A",
             "date": sale.date.strftime("%Y-%m-%d"),
             "time": sale.time.strftime("%H:%M:%S"),
-            'branch':sale.order.branch.location,
+            'branch':f'{sale.order.branch.location} - {sale.order.branch.area}',
             "payment_method": sale.payment_method,
             "total_amount": sale.order.final_total if sale.order else 0,
         })
