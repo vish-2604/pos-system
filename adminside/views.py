@@ -24,6 +24,7 @@ from django.db.models.functions import TruncMonth # type: ignore
 import re
 import csv
 from django.http import JsonResponse # type: ignore
+from datetime import date
 
 
 def render_page(request, template, data=None):
@@ -473,8 +474,8 @@ def categories(request):
 
     return render_page(request, 'adminside/categories.html',{"categories":categories,"form":CategoryForm()})
 
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage # type: ignore
+from django.core.files.base import ContentFile # type: ignore
 
 
 def inventory(request):
@@ -633,10 +634,19 @@ def customer(request):
         form = CustomerForm()
     return render_page(request, 'adminside/customer.html', {"customers": customers, "form": form})
 
-def reports(request):
-    filter_type = request.GET.get('filter', 'all')  
 
+
+
+from datetime import date  # ✅ Required import
+
+from collections import defaultdict
+import re
+from datetime import date
+
+def reports(request):
+    filter_type = request.GET.get('filter', 'all')
     today = date.today()
+
     if filter_type == 'today':
         start_date = today
         sales_data = Sales.objects.filter(date=start_date)
@@ -646,49 +656,53 @@ def reports(request):
     elif filter_type == 'yearly':
         start_date = today.replace(month=1, day=1)
         sales_data = Sales.objects.filter(date__gte=start_date)
-    else:  
+    else:
         sales_data = Sales.objects.all()
 
-    sales_data = sales_data.select_related('order__branch')  
+    sales_data = sales_data.select_related('order__branch')
 
-    grouped_data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {'quantity': 0, 'image': None})))
+    grouped_data = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+
     for sale in sales_data:
         sale_date = sale.date.strftime('%Y-%m-%d')
-        branch_name = f'{sale.order.branch.location} - {sale.order.branch.area}',
-        order_items = sale.order.ordered_items  
-        image_urls = sale.order.image_urls  
+        branch_name = f"{sale.order.branch.location} - {sale.order.branch.area}"
 
-        product_images ={}
+        for item_name, details in sale.order.ordered_items.items():
+            if isinstance(details, dict):
+                quantity = details.get('quantity', 0)
+            elif isinstance(details, list):
+                quantity = details[0].get('quantity', 0) if details and isinstance(details[0], dict) else 0
+            else:
+                quantity = 0  
 
-        for index, (item_name, details) in enumerate(order_items.items()):
-            base_name = item_name.rsplit('_', 1)[0]  
-            quantity = details['quantity']
+            clean_name = re.sub(r'_(small|medium|large)$', '', item_name)  
 
-            if base_name not in product_images:
-                image_url = image_urls[index] if index < len(image_urls) else '/static/images/default.png'
-                product_images[base_name] = image_url
+            if clean_name in grouped_data[sale_date][branch_name]:
+                grouped_data[sale_date][branch_name][clean_name] += quantity 
+            else:
+                grouped_data[sale_date][branch_name][clean_name] = quantity 
 
-            grouped_data[sale_date][branch_name][base_name]['quantity'] += quantity
-            grouped_data[sale_date][branch_name][base_name]['image'] = product_images[base_name]
+    formatted_data = []
+    for report_date, branches in grouped_data.items():
+        branch_list = []
 
-    formatted_data = [
-        {
-            'date': date,
-            'branches': [
-                {
-                    'branch_name': branch,
-                    'products': [
-                        {'name': name, 'quantity': details['quantity'], 'image': details['image']}
-                        for name, details in items.items()
-                    ]
-                }
-                for branch, items in branches.items()
-            ]
-        }
-        for date, branches in grouped_data.items()
-    ]
+        for branch, products in branches.items():
+            product_list = [{'name': name, 'quantity': quantity} for name, quantity in products.items()]
+            
+            branch_list.append({
+                'branch_name': branch,
+                'products': product_list,
+                'product_count': len(product_list)  # ✅ Calculate count here
+            })
+
+        formatted_data.append({
+            'date': report_date,
+            'branches': branch_list,
+            'date_rowspan': sum(branch['product_count'] for branch in branch_list)  # ✅ Fix applied here
+        })
 
     return render_page(request, 'adminside/reports.html', {'data': formatted_data, 'filter_type': filter_type})
+
 
 
 

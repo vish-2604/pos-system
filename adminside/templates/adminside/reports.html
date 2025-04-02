@@ -33,32 +33,22 @@
         <th>Quantity</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody >
       {% for entry in data %}
-      {% for branch in entry.branches %}
-      {% for product in branch.products %}
-      <tr style="border-bottom: 1px solid grey;">
-        {% if forloop.parentloop.first and forloop.first %}
-        <td rowspan="{{ branch.products|length }}"
-          style="border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 5px;">
-          {{ entry.date }}
-        </td>
-        <td rowspan="{{ branch.products|length }}"
-          style="border-right: 1px solid grey; border-bottom: 1px solid grey; padding: 5px;">
-          {{ branch.branch_name|join:"" }}
-        </td>
-        {% endif %}
-        <td>{{ product.name }}</td>
-        <td>{{ product.quantity }}</td>
-      </tr>
+        <tr>
+          <td rowspan="{{ entry.date_rowspan }}" style="border-bottom: 1px solid gray;border-right: 1px solid gray;" >{{ entry.date }}</td>
+          {% for branch in entry.branches %}
+            <td rowspan="{{ branch.product_count }}" style="border-bottom: 1px solid gray;border-right: 1px solid gray;">{{ branch.branch_name }}</td>
+            {% for product in branch.products %}
+              <td style="border-bottom: 1px solid gray;">{{ product.name }}</td>
+              <td style="border-bottom: 1px solid gray;">{{ product.quantity }}</td>
+            </tr>
+            {% if not forloop.last %}<tr>{% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% if not forloop.last %}</tr>{% endif %}
       {% endfor %}
-      {% endfor %}
-      {% empty %}
-      <tr>
-        <td colspan="7" class="text-center">No branches found.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
+    </tbody>    
   </table>
 </div>
 
