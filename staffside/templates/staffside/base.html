@@ -25,11 +25,12 @@
         .notification-container {
             position: relative;
             display: inline-block;
+            margin-top: 10px;
         }
 
         .notification-link {
             position: relative;
-            font-size: 20px;
+            font-size: 18px;
             color: black;
             text-decoration: none;
             cursor: pointer;
@@ -84,7 +85,86 @@
         }
 
         .notifications-dropdown ul li:last-child {
-            border-bottom: none;
+           border-bottom: none;
+        }
+
+        @media (max-width: 530px) {
+        .notifications-dropdown {
+            width: 90%;
+            right: 5%;
+            left: auto;
+            max-height: 200px;
+            top: 45px;
+        }
+        }
+
+        /* Center and add horizontal scrolling on small screens */
+        @media (max-width: 400px) {
+        .notifications-dropdown {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 200px;
+            /* Prevents it from being too wide */
+            overflow-x: auto;
+            /* Allow horizontal scrolling */
+            white-space: nowrap;
+            /* Prevents text wrapping */
+        }
+        }
+
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 0;
+            background: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            border-radius: 8px;
+            z-index: 1000;
+            align-items: center;
+            /* Center items horizontally */
+            text-align: center;
+            /* Center text */
+        }
+
+        .profile-dropdown img {
+            width: 50px;
+            /* Slightly larger for better visibility */
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .profile-dropdown h5 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .profile-dropdown p {
+            font-size: 14px;
+            color: gray;
+        }
+
+        .profile-dropdown a {
+            display: block;
+            padding: 8px;
+            text-decoration: none;
+            color: black;
+            font-size: 14px;
+            text-align: center;
+
+        }
+
+        .profile-dropdown a:hover {
+            background-color: #f0f0f0;
+            border-radius: 5px;
         }
     </style>
 
@@ -106,7 +186,7 @@
                     <span id="notification-dot" class="notification-dot" style="background-color: orange;"></span>
                     {% endif %}
                 </a>
-            
+
                 <div id="notificationDropdown" class="notifications-dropdown"
                     style="{% if open_notifications %}display: block;{% else %}display: none;{% endif %}">
                     <h4>Notifications</h4>
@@ -121,21 +201,21 @@
                     </ul>
                 </div>
             </div>
-            
+
             <script>
                 function toggleNotifications(event) {
                     event.preventDefault(); // Prevent default link behavior
-            
+
                     let dropdown = document.getElementById("notificationDropdown");
                     let dot = document.getElementById("notification-dot");
-            
+
                     // If notifications are unseen, mark them as seen and keep dropdown open
                     if (dot) {
                         dot.remove();
                         let newUrl = window.location.href.includes("?") ? window.location.href + "&mark_seen=true" : "?mark_seen=true";
                         history.replaceState(null, null, newUrl); // Update URL without reloading
                     }
-            
+
                     // Toggle the dropdown open/close behavior
                     if (dropdown.style.display === "block") {
                         dropdown.style.display = "none"; // Close dropdown on second click
@@ -143,34 +223,55 @@
                         dropdown.style.display = "block"; // Open dropdown on first click
                     }
                 }
-            
+
                 // Close dropdown when clicking outside
-                document.addEventListener("click", function(event) {
+                document.addEventListener("click", function (event) {
                     let dropdown = document.getElementById("notificationDropdown");
                     let bell = document.querySelector(".notification-link");
-            
+
                     if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
                         dropdown.style.display = "none";
                     }
                 });
             </script>
-        
-            <span id="current-date">{{ user.username }}<br /></span>
-            <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image"
-                class="staff-profile-img rounded-circle"
-                style="width: 50px; height: 50px; object-fit: cover;margin-left: -3px;margin-bottom: 8px;">
+
+            <div class="profile-container">
+                <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image"
+                    class="staff-profile-img rounded-circle" id="profileImage"
+                    style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;">
+
+                <!-- Dropdown Menu -->
+                <div id="profileDropdown" class="profile-dropdown">
+                    <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image"
+                        class="staff-profile-img rounded-circle" id="profileImage"
+                        style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;">
+                    <h5>{{ user.username }}</h5>
+                    <p>{{ user.staff_email }}</p>
+                    <hr>
+                    <a href="{% url 'staffside:settings' %}"><i class="fa fa-cogs"></i> Settings</a>
+                    <a href="{% url 'accounts:logoutaccount' %}"><i class="fa fa-sign-out"></i> Logout</a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Get today's date in "Y-m-d" format
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading 0 if month is single digit
-        const day = String(today.getDate()).padStart(2, '0'); // Add leading 0 if day is single digit
-        const formattedDate = `${year}-${month}-${day}`;
+        document.addEventListener("DOMContentLoaded", function () {
+            let profileImage = document.getElementById("profileImage");
+            let profileDropdown = document.getElementById("profileDropdown");
 
-        document.getElementById("current-date").innerHTML += formattedDate;
+            profileImage.addEventListener("click", function (event) {
+                event.stopPropagation(); // Prevent event bubbling
+                profileDropdown.style.display = (profileDropdown.style.display === "block") ? "none" : "block";
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener("click", function (event) {
+                if (!profileDropdown.contains(event.target) && event.target !== profileImage) {
+                    profileDropdown.style.display = "none";
+                }
+            });
+        });
     </script>
 
     <div class="sidebar" id="sidebar">

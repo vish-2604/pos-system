@@ -482,28 +482,27 @@ def sales(request):
 
     for sale in sales_today:
         if sale.order and sale.order.ordered_items:
-            # Ensure ordered_items is a dictionary (convert from string if needed)
             if isinstance(sale.order.ordered_items, str):
-                ordered_items = json.loads(sale.order.ordered_items)  # Convert string to dict
+                ordered_items = json.loads(sale.order.ordered_items) 
             else:
-                ordered_items = sale.order.ordered_items  # Already a dictionary
+                ordered_items = sale.order.ordered_items  
             
-            # Process items
             for item_name, details in ordered_items.items():
-                # Extract base item name (Remove _small, _medium, _large)
                 base_item = re.sub(r'_(small|medium|large)$', '', item_name)
                 item_counter[base_item] += details["quantity"]
 
-    # Get the best-selling item
-    best_selling_item = item_counter.most_common(1)
-    best_selling_item = best_selling_item[0][0] if best_selling_item else "No Sales"
+    if item_counter:
+        max_quantity = max(item_counter.values())
+        best_selling_item = [item for item, qty in item_counter.items() if qty == max_quantity]
+    else:
+        best_selling_item = ["No Sales"]
 
     context = {
         "sales": sales_today,
         "total_sales": total_sales,
         "num_orders": num_orders,
         "total_discounts": total_discounts,
-        "best_selling_item": best_selling_item,
+        "best_selling_item": ", ".join(best_selling_item),
     }
     
     return render_page(request, 'staffside/sales.html', context)

@@ -31,6 +31,8 @@ class Command(BaseCommand):
             # Determine if the item is expiring today, tomorrow, or the day before expiry
             if item.exp_date == today_ist:
                 expiry_day = "today"
+                item.active = False
+                item.save(update_fields=['active'])
             elif item.exp_date == tomorrow_ist:
                 expiry_day = "tomorrow"
             else:

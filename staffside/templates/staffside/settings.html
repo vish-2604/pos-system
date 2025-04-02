@@ -37,23 +37,11 @@
     <div class="top-navbar">
       <div class="user-info">
         <span class="notification"><i class="fa-solid fa-bell"></i></span>
-        <span id="current-date">{{ user.username }}<br/></span>
         <img src="{{ user.staff_img.url }}?{{ user.staff_img }}" alt="Profile Image" 
         class="staff-profile-img rounded-circle" 
         style="width: 50px; height: 50px; object-fit: cover;margin-left: -3px;margin-bottom: 8px;">
          </div>
     </div>
-    
-    <script>
-      // Get today's date in "Y-m-d" format
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading 0 if month is single digit
-      const day = String(today.getDate()).padStart(2, '0'); // Add leading 0 if day is single digit
-      const formattedDate = `${year}-${month}-${day}`;
-    
-      document.getElementById("current-date").innerHTML += formattedDate;
-    </script>
 
     <div class="sidebar" id="sidebar">
       <div class="pos-name">
@@ -63,7 +51,7 @@
         <li>
           <a
             href="{% url 'staffside:profile' %}"
-            class="nav-link {% if request.path == '/profile/' %}active{% endif %}"
+            class="nav-link {% if request.path == '/staffside/profile/' %}active{% endif %}"
           >
             <i
               class="fa {% if request.path == '/profile/' %}fa-user-circle{% else %}fa-user{% endif %}"
@@ -74,7 +62,7 @@
         <li>
           <a
             href="{% url 'staffside:edit_profile' %}"
-            class="nav-link {% if request.path == '/edit_profile/' %}active{% endif %}"
+            class="nav-link {% if request.path == '/staffside/edit_profile/' %}active{% endif %}"
           >
             <i
               class="fa {% if request.path == '/edit_profile/' %}fa-pen-to-square{% else %}fa-edit{% endif %}"
@@ -85,7 +73,7 @@
         <li>
           <a
             href="{% url 'staffside:change_password' %}"
-            class="nav-link {% if request.path == '/change_password/' %}active{% endif %}"
+            class="nav-link {% if request.path == '/staffside/change_password/' %}active{% endif %}"
           >
             <i
               class="fa {% if request.path == '/change_password/' %}fa-lock-open{% else %}fa-lock{% endif %}"
@@ -96,7 +84,7 @@
         <li>
           <a
             href="{% url 'staffside:pos' %}"
-            class="nav-link {% if request.path == '/pos/' %}active{% endif %}"
+            class="nav-link {% if request.path == '/staffside/pos/' %}active{% endif %}"
           >
             <i
               class="fa {% if request.path == '/pos/' %}fa-tachometer-alt{% else %}fa-home{% endif %}"

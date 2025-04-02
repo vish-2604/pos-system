@@ -5,14 +5,13 @@ from django.contrib.auth.hashers import make_password # type: ignore
 from django.contrib.auth.hashers import make_password, check_password # type: ignore 
 from django.core.exceptions import ValidationError # type: ignore 
 import re
-from django.apps import apps
+from django.apps import apps # type: ignore
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin # type: ignore
 from django.contrib.auth.hashers import make_password, check_password # type: ignore
 from django.utils import timezone # type: ignore
 from django.utils.timezone import now  # type: ignore
 from django.core.exceptions import ObjectDoesNotExist # type: ignore
 from django.core.validators import RegexValidator # type: ignore
-
 
 def get_notification():
     Notification = apps.get_model('staffside', 'Notification')
@@ -66,7 +65,7 @@ class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
     customer_firstname = models.CharField(max_length=50)
     customer_lastname = models.CharField(max_length=50)
-    customer_email = models.EmailField(max_length=50, blank=True)
+    customer_email = models.EmailField(max_length=50, blank=True,unique=True)
     customer_phone = models.CharField(
         max_length=10,
         validators=[RegexValidator(regex=r'^[6789]\d{9}$', message="Phone number must be 10 digits and start with 6, 7, 8, or 9.")]
@@ -80,10 +79,6 @@ def validate_phone(value):
     if not phone_pattern.match(value):
         raise ValidationError("Enter a valid 10-digit phone number starting with 6,7,8,9.")
 
-
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.contrib.auth.hashers import make_password, check_password
-from django.db import models
 
 class StaffManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):

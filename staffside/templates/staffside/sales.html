@@ -10,6 +10,19 @@
     .card {
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     }
+
+    .row.text-center .col-md-3 {
+        display: flex;
+    }
+
+    .row.text-center .col-md-3 .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
 </style>
 
 <div class="container mt-4">
@@ -35,8 +48,8 @@
         </div>
         <div class="col-md-3">
             <div class="card p-3">
-                <h5>Best-Selling Item</h5>
-                <p class="fw-bold" style="color: #F89B34;">{{ best_selling_item }}</p>
+                <h5>Best-Selling Items</h5>
+                <p class="fw-bold text-wrap" style="color: #F89B34; white-space: normal;">{{ best_selling_item }}</p>
             </div>
         </div>
     </div>
@@ -46,10 +59,10 @@
     <div class="card mt-4 p-3">
         <h3>Sales Details</h3>
         <div class="d-flex mb-3">
-            <input type="text" id="searchInput" class="form-control me-2"
-                placeholder="Search by order id or date">
+            <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by order id or date">
             <span>
-                <button class="search-btn btn btn-outline-primary"  style="background-color: #f9c784;color: black;" onclick="filterTable()">
+                <button class="search-btn btn btn-outline-primary" style="background-color: #f9c784;color: black;"
+                    onclick="filterTable()">
                     <i class="fa fa-search"></i>
                 </button>
             </span>
@@ -64,13 +77,13 @@
                         <th>Payment Method</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Rating</th>  
+                        <th>Rating</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for sale in sales %}
-                    
+
                     <tr>
                         <td>#{{ sale.order.order_id }}</td>
                         <td>{{ sale.order.table.table_id }}</td>
@@ -80,16 +93,17 @@
                         <td>{{ sale.time }}</td>
                         <td>
                             {% if sale.rating %}
-                                ⭐ {{ sale.rating.rating }}/5
+                            ⭐ {{ sale.rating.rating }}/5
                             {% else %}
-                                <span style="color: gray;">Not Rated</span>
+                            <span style="color: gray;">Not Rated</span>
                             {% endif %}
-                        </td>                
+                        </td>
                         <td>
-                            <a class="btn receipte-btn"  style="background-color: #4E598C;color: white;" href="{% url 'staffside:print_bill' sale.sales_id %}">
+                            <a class="btn receipte-btn" style="background-color: #4E598C;color: white;"
+                                href="{% url 'staffside:print_bill' sale.sales_id %}">
                                 Reprint Receipt
                             </a>
-                            
+
                         </td>
                     </tr>
                     {% endfor %}
