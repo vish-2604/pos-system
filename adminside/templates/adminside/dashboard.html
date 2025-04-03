@@ -120,51 +120,51 @@
         </div>
 
         <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                var ctx = document.getElementById("salesChart").getContext("2d");
+document.addEventListener("DOMContentLoaded", function () {
+    var ctx = document.getElementById("salesChart").getContext("2d");
 
-                new Chart(ctx, {
-                    type: "line",
-                    data: {
-                        labels: {{ sales_labels| safe }},
-                datasets: [{
-                    label: "Sales (₹)", 
-                    data: {{ sales_values| safe }},
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: {{ sales_labels| safe }},
+            datasets: [{
+                label: "Sales (₹)", 
+                data: {{ sales_values| safe }},
                 borderColor: "#4E598C",  
                 backgroundColor: "rgba(78, 89, 140, 0.2)", 
                 borderWidth: 3,
                 fill: true,
                 tension: 0.4  
-                        }]
-                    },
-                options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        ticks: {
-                            font: { size: 14 }, 
-                            color: "#000"
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: { font: { size: 14 } } 
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, 
+            scales: {
+                x: {
+                    ticks: {
+                        font: { size: 14 }, 
+                        color: "#000"
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: "top", 
-                        labels: {
-                            font: { size: 14 }
-                        }
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 14 } } 
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "top", 
+                    labels: {
+                        font: { size: 14 }
                     }
                 }
             }
-                });
-            });
-        </script>
+        }
+    });
+});
+</script>
 
         <div class="col-md-4">
             <div class="card p-3 best-selling h-100">

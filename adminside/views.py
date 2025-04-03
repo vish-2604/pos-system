@@ -25,6 +25,8 @@ import re
 import csv
 from django.http import JsonResponse # type: ignore
 from datetime import date
+from django.db.models import F, Sum # type: ignore
+
 
 
 def render_page(request, template, data=None):
@@ -77,8 +79,7 @@ def dashboard(request):
 
     total_sales = Sales.objects.aggregate(total=Sum('order__final_total'))['total'] or 0
 
-    total_cost = Purchase.objects.aggregate(total_cost=Sum('cost_price'))['total_cost'] or 0
-
+    total_cost = Purchase.objects.aggregate(total_cost=Sum(F('cost_price') * F('quantity')))['total_cost'] or 0
     total_profit = total_sales - total_cost
 
 
