@@ -18,20 +18,35 @@
     <div class="table-bar rounded px-1">
       <ul class="nav nav-pills" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" data-bs-toggle="pill" href="#allTables">All Tables</a>
+            <a class="nav-link active" data-bs-toggle="pill" href="#allTables" onclick="filterByStatus('')">All Tables</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="pill" href="#vacant">Vacant</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#vacant" onclick="filterByStatus('vacant')">Vacant</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="pill" href="#occupied">Occupied</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#occupied" onclick="filterByStatus('occupied')">Occupied</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="pill" href="#reserved">Reserved</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#reserved" onclick="filterByStatus('disabled')">Reserved</a>
         </li>
-      </ul>
+    </ul>    
     </div>
   </div>
+  
+  
+  <div class="right-side">
+      <select id="branchDropdown" class="form-select form-select-sm w-auto"
+      >
+      
+      <option value="" disabled selected>Select Branch</option>
+      {% for branch in branches %}
+      <option value="{{ branch.branch_id }}" 
+      {% if selected_branch and branch.id|stringformat:"s" == selected_branch.id|stringformat:"s" %}selected{% endif %}>
+      {{ branch.location }} - {{ branch.area }}
+    </option>
+    {% endfor %}
+  </select>
+
   <button class="open-button add-table-button rounded-3">
     <span class="btn-text">
       <i class="fa-solid fa-plus plus-icon"></i> Add Table
@@ -40,10 +55,36 @@
   </button>
 </div>
 
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let dropdown = document.getElementById("branchDropdown"); // Change to your actual dropdown ID
+    
+    // Get the branch_id from the URL
+    let params = new URLSearchParams(window.location.search);
+    let branchId = params.get("branch_id"); 
+    
+    if (branchId) {
+      dropdown.value = branchId;  // Set dropdown to match URL
+    }
+    
+    dropdown.addEventListener("change", function () {
+      let selectedValue = dropdown.value;
+      window.location.href = window.location.pathname + "?branch_id=" + selectedValue;
+    });
+    
+    console.log("Dropdown should be set to:", branchId);
+  });
+</script>
+
+</div>
+
 <div class="overlay" id="overlay"></div>
 <div class="form-popup" id="myForm">
   <form id="tableForm" method="POST" action="{% url 'adminside:tables' %}">
     {% csrf_token %}
+    <input type="hidden" id="branchInput" name="branch_id" value="" />
+
     <div class="form-title">
       <h1 class="mb-3">Add Table</h1>
       <button type="button" class="btn btn-close" onclick="closeForm()"></button>
@@ -81,6 +122,8 @@
 <div class="tab-content">
   <div id="allTables" class="container tab-pane fade show active">
     <br />
+    {% if selected_branch %}
+    {% if tables %}
     <div class="d-flex flex-wrap justify-content-center">
       {% for table in tables %}
       <div class="table-card {{ table.status }}" data-table-number="T-{{ table.table_id }}"
@@ -107,13 +150,20 @@
       </div>
       {% endfor %}
     </div>
+    {% else %}
+    <p class="text-center">No tables available for this branch.</p>
+    {% endif %}
+    {% else %}
+    <p class="text-center">Please select a branch first.</p>
+    {% endif %}
   </div>
+
 
   <div id="vacant" class="container tab-pane fade">
     <br />
     <div class="d-flex flex-wrap justify-content-center">
       {% for table in tables %}
-      {% if table.status == "vacant" %}
+      {% if selected_branch and table.branch.branch_id == selected_branch.branch_id and table.status == "vacant" %}
       <div class="table-card vacant" data-table-number="T-{{ table.table_id }}" data-status="Vacant"
         data-num-people="{{ table.seats }}" data-ordered-items="[]">
         <div class="table-shape">
@@ -127,35 +177,36 @@
       {% endif %}
       {% endfor %}
     </div>
-  </div>
+</div>
 
 
-  <div id="occupied" class="container tab-pane fade">
-    <br />
-    <div class="d-flex flex-wrap justify-content-center">
-      {% for table in tables %}
-      {% if table.status == "occupied" %}
-      <div class="table-card occupied" data-table-number="T-{{ table.table_id }}" data-status="Occupied"
-        data-num-people="{{ table.seats }}" data-ordered-items="[]">
-        <div class="table-shape">
-          <p class="table-text">T-{{ table.table_id }}</p>
-        </div>
-        <div class="seat top"></div>
-        <div class="seat bottom"></div>
-        <div class="seat left"></div>
-        <div class="seat right"></div>
+
+<div id="occupied" class="container tab-pane fade">
+  <br />
+  <div class="d-flex flex-wrap justify-content-center">
+    {% for table in tables %}
+    {% if selected_branch and table.branch.branch_id == selected_branch.branch_id and table.status == "occupied" %}
+    <div class="table-card occupied" data-table-number="T-{{ table.table_id }}" data-status="Occupied"
+      data-num-people="{{ table.seats }}" data-ordered-items="[]">
+      <div class="table-shape">
+        <p class="table-text">T-{{ table.table_id }}</p>
       </div>
-      {% endif %}
-      {% endfor %}
+      <div class="seat top"></div>
+      <div class="seat bottom"></div>
+      <div class="seat left"></div>
+      <div class="seat right"></div>
     </div>
+    {% endif %}
+    {% endfor %}
   </div>
+</div>
 
   <div id="reserved" class="container tab-pane fade">
     <br />
     <div class="d-flex flex-wrap justify-content-center">
       {% for table in tables %}
-      {% if table.status == "disabled" %}
-      <div class="table-card reserved" data-table-number="T-{{ table.table_id }}" data-status="Disabled"
+      {% if selected_branch and table.branch.branch_id == selected_branch.branch_id and table.status == "reserved" %}
+      <div class="table-card reserved" data-table-number="T-{{ table.table_id }}" data-status="reserved"
         data-num-people="{{ table.seats }}" data-ordered-items="[]">
         <div class="table-shape">
           <p class="table-text">T-{{ table.table_id }}</p>

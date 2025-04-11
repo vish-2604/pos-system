@@ -102,6 +102,7 @@ function validateForm(event) {
 
 document.getElementById("foodItemForm").addEventListener("submit", validateForm);
 
+
 document.addEventListener("DOMContentLoaded", function () {
   const overlay = document.getElementById("overlay");
   const formPopup = document.getElementById("myForm");
@@ -118,7 +119,15 @@ document.addEventListener("DOMContentLoaded", function () {
           isUpdate = true;
           submitBtn.textContent = "Update";
           inventoryIdInput.value = inventoryData.id || "";
-          document.getElementById("itemName").value = inventoryData.name || "";
+          let itemNameDropdown = document.getElementById("itemName");
+          let selectedValue = inventoryData.name || "";
+
+          for (let option of itemNameDropdown.options) {
+              if (option.textContent.trim() === selectedValue) {
+                  option.selected = true;
+                  break;
+              }
+          }
           document.getElementById("itemDescription").value = inventoryData.description || "";
           document.getElementById("itemCost").value = inventoryData.cost || "";
           document.getElementById("itemSelling").value = inventoryData.price || "";

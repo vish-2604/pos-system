@@ -27,6 +27,7 @@ class Table(models.Model):
     table_id = models.AutoField(primary_key=True)
     seats = models.IntegerField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='vacant')
+    branch = models.ForeignKey('Branch', on_delete=models.CASCADE, related_name="tables", null=False, blank=False)
 
     def create_tablecart_table(self):
         """Dynamically create a new table for this specific table_id."""

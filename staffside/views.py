@@ -30,7 +30,9 @@ import json  # Import JSON to ensure proper deserialization
 import re
 from django.http import JsonResponse # type: ignore
 from django.core.mail import send_mail # type: ignore
-
+from django.template.loader import render_to_string # type: ignore
+from django.utils.html import strip_tags # type: ignore
+from django.utils.timezone import localtime # type: ignore
 
 
 def render_page(request, template, data=None):
@@ -44,10 +46,8 @@ def render_page(request, template, data=None):
     }
 
     if request.user.is_authenticated:
-        # Get all notifications for today
         all_notifications = Notification.objects.filter(created_at__date=today).order_by("-created_at")
 
-        # Get unseen notifications for the logged-in user
         unseen_notifications = all_notifications.exclude(
             notificationseen__user=request.user,
             notificationseen__seen=True
@@ -57,7 +57,6 @@ def render_page(request, template, data=None):
         context["has_unseen"] = unseen_notifications.exists()
         context["unseen_notifications"] = unseen_notifications 
 
-        # Only mark as seen when user explicitly triggers the action
         if "mark_seen" in request.GET:
             NotificationSeen.objects.bulk_create([
                 NotificationSeen(user=request.user, notification=n, seen=True)
@@ -77,34 +76,40 @@ def render_page(request, template, data=None):
 def home(request):
     messages.success(request, "✅ Login successful!")  
     return redirect('staffside:pos')
-from django.db import connection # type: ignore
+
 
 def pos(request):
     categories = Categories.objects.filter(status=True)
-    tables = Table.objects.all()
-    search_query = request.GET.get("search", "")  # Get search query from URL
+
+    staff_user = request.user
+    if staff_user.is_authenticated and staff_user.branch:
+        tables = Table.objects.filter(branch=staff_user.branch)
+    else:
+        tables = Table.objects.none()
+        
+    search_query = request.GET.get("search", "")  
 
     
     selected_category = request.GET.get("category", "all")
-    selected_table = request.GET.get("table", "")  # Get selected table from URL
+    selected_table = request.GET.get("table", "")  
 
     try:
         selected_category = int(selected_category)
     except ValueError:
         selected_category = "all"
 
-    user_branch = request.user.branch  # Assuming User model has a 'branch' field
+    user_branch = request.user.branch  
 
     if selected_category != "all":
             food_items = FoodItem.objects.filter(
                 category_id=selected_category, 
                 branch=user_branch,
-                name__icontains=search_query  # Search by name using a case-insensitive search
+                name__icontains=search_query  
             )
     else:
             food_items = FoodItem.objects.filter(
                 branch=user_branch,
-                name__icontains=search_query  # Search by name in all categories
+                name__icontains=search_query  
             )
 
     
@@ -129,7 +134,7 @@ def pos(request):
         'tables': tables,
         'selected_table': selected_table,
         'cart_items': cart_items,
-        'search_query': search_query,  # Pass the search query to the template
+        'search_query': search_query,
 
     })
 
@@ -147,7 +152,6 @@ def add_to_cart(request):
         table_cart_name = f"table_{table_id}_cart"
 
         with connection.cursor() as cursor:
-            # Check if the same item with the same size exists
             cursor.execute(
                 f"SELECT cart_id, quantity FROM {table_cart_name} WHERE order_item=%s AND size=%s",
                 [food_item, size]
@@ -162,7 +166,6 @@ def add_to_cart(request):
                     [new_quantity, cart_id]
                 )
             else:
-                # Correcting the INSERT statement
                 cursor.execute(
                     f"INSERT INTO {table_cart_name} (table_id, order_item, size, quantity, price, image_url) VALUES (%s, %s, %s, %s, %s, %s)",
                     [table_id, food_item, size, quantity, price, image_url]
@@ -177,7 +180,7 @@ def update_cart(request):
     if request.method == "POST":
         table_id = request.POST.get("table_id")
         cart_id = request.POST.get("order_item_id")
-        action = request.POST.get("action")  # "increase" or "decrease"
+        action = request.POST.get("action")  
 
         if not table_id or not cart_id:
             messages.error(request, "Invalid request. Missing table or cart ID.")
@@ -185,7 +188,6 @@ def update_cart(request):
 
         table_cart_name = f"table_{table_id}_cart"
 
-        # Construct SQL queries dynamically to update the correct table
         with connection.cursor() as cursor:
             if action == "increase":
                 cursor.execute(f"UPDATE {table_cart_name} SET quantity = quantity + 1 WHERE cart_id = %s", [cart_id])
@@ -247,21 +249,20 @@ def place_order(request):
         
         unavailable_items = []
 
-        # ✅ Implementing FIFO-based inventory deduction
         with transaction.atomic():
             for item_name, size, quantity, price, image_url in cart_items:
                 try:
-                    # Fetch inventory in FIFO order (oldest first)
                     inventory_items = Inventory.objects.filter(
                         purchase__food_item=item_name, 
+                        purchase__branch=staff_member.branch, 
                         active=True
                     ).order_by('purchase__purchased_date')
 
-                    remaining_qty = quantity  # How much we still need to deduct
+                    remaining_qty = quantity  
 
                     for inventory_item in inventory_items:
                         if remaining_qty <= 0:
-                            break  # Stop when deduction is complete
+                            break  
                         
                         if inventory_item.quantity >= remaining_qty:
                             inventory_item.quantity -= remaining_qty
@@ -269,7 +270,7 @@ def place_order(request):
                         else:
                             remaining_qty -= inventory_item.quantity
                             inventory_item.quantity = 0
-                            inventory_item.active = False  # Mark inactive if out of stock
+                            inventory_item.active = False  
 
                         inventory_item.save()
 
@@ -283,7 +284,6 @@ def place_order(request):
                 messages.error(request, f"Stock unavailable for: {', '.join(unavailable_items)}")
                 return redirect("staffside:pos")
              
-            # ✅ Handling existing order
             if existing_order:
                 ordered_items = existing_order.ordered_items or {}
                 existing_image_urls = existing_order.image_urls or []
@@ -397,22 +397,7 @@ def submit_rating(request, order_id, rating_value):
 def print_bill(request, sale_id):
     sale = Sales.objects.get(sales_id=sale_id)
 
-    rating_submitted = Rating.objects.filter(order=sale).exists()  # Check if already rated
-
-    if request.method == "POST":
-        rating_value = request.POST.get("rating")
-        if rating_value:
-            rating_value = int(rating_value)
-
-            rating, created = Rating.objects.update_or_create(
-                order=sale,  
-                defaults={'rating': rating_value}
-            )
-            rating_submitted = True
-            messages.success(request, "Thank you for your feedback!")
-            return redirect(request.path) 
-
-
+    rating_submitted = Rating.objects.filter(order=sale).exists()  
 
     barcode_dir = os.path.join(settings.MEDIA_ROOT, "barcodes")
     os.makedirs(barcode_dir, exist_ok=True)
@@ -433,22 +418,55 @@ def print_bill(request, sale_id):
 
     barcode_url = f"{settings.MEDIA_URL}barcodes/{barcode_filename}"
 
+    if request.method == "POST":
+        rating_value = request.POST.get("rating")
+        if "send_email" in request.POST:
+            email = request.POST.get("email")
+            if email:
+                subject = "Your E-Bill Receipt"
+                html_message = render_to_string("staffside/email_bill.html", {'sale': sale})
+                plain_message = strip_tags(html_message)
+                from_email = settings.DEFAULT_FROM_EMAIL
+                recipient_list = [email]
+
+                send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
+
+                messages.success(request, "E-Bill sent successfully!")
+                return redirect(request.path)
+        if rating_value:
+            rating_value = int(rating_value)
+
+            rating, created = Rating.objects.update_or_create(
+                order=sale,  
+                defaults={'rating': rating_value}
+            )
+            rating_submitted = True
+            messages.success(request, "Thank you for your feedback!")
+            return redirect(request.path) 
+
+
+
     return render_page(request, 'staffside/print_bill.html', {
         'sale': sale,
         'barcode_url': barcode_url,
-        'change': 0.00
     })
 
 
 def tables(request):
-    tables = Table.objects.all()
-    orders = Order.objects.filter(status="pending")  # Fetch only pending orders
+    staff_user = request.user
+
+    if staff_user.is_authenticated and staff_user.branch:
+        tables = Table.objects.filter(branch=staff_user.branch)
+    else:
+        tables = Table.objects.none()
+
+    orders = Order.objects.filter(status="pending")  
 
     orders_by_table = {order.table.table_id: order for order in orders}
 
     if request.method == "POST":
         table_id = request.POST.get('table_id')
-        status = request.POST.get('status')  # Get the status from the form
+        status = request.POST.get('status')  
 
         if table_id.startswith('T-'):
             table_id = table_id[2:]
@@ -467,7 +485,6 @@ def tables(request):
         "orders_by_table": orders_by_table
     })
 
-from django.utils.timezone import localtime # type: ignore
 
 def sales(request):
     user = request.user

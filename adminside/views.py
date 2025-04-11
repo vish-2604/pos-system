@@ -75,7 +75,20 @@ def home(request):
 def dashboard(request):
     total_orders = Order.objects.count()
 
-    total_customers = Customer.objects.count()
+    best_employee = (
+        Order.objects.values("staff__staff_fullname", "staff__branch__location")
+        .annotate(order_count=Count("order_id"))
+        .order_by("-order_count")
+        .first()
+    )
+
+    if best_employee:
+        best_employee_name = best_employee["staff__staff_fullname"]
+        best_employee_branch = best_employee["staff__branch__location"]
+    else:
+        best_employee_name = "N/A"
+        best_employee_branch = "N/A"
+
 
     total_sales = Sales.objects.aggregate(total=Sum('order__final_total'))['total'] or 0
 
@@ -167,7 +180,6 @@ def dashboard(request):
 
             if category_name in category_totals:
                 category_totals[category_name] += details["quantity"] * details["price"]
-                print(category_name,details["quantity"] * details["price"])
 
     category_labels = list(category_totals.keys())
     category_values = list(category_totals.values())
@@ -187,8 +199,9 @@ def dashboard(request):
 
     context = {
         'total_orders': total_orders,
-        'total_customers': total_customers,
         'total_sales': total_sales,
+        'best_employee_name': best_employee_name,
+        'best_employee_branch': best_employee_branch,
         'sales_labels': sales_labels,
         'sales_values': sales_values,
         'weekly_sales': weekly_sales,
@@ -236,7 +249,6 @@ def staff(request):
 
 
         if form.is_valid():
-            print("hello")
             staff = form.save(commit=False)
             staff.save()      
             messages.success(request, message)
@@ -307,7 +319,6 @@ def suppliers(request):
             return redirect('adminside:suppliers')
 
         supplier_id = request.POST.get('supplier_id')
-        print(supplier_id)
 
         if supplier_id:
             supplier = Supplier.objects.get(supplier_id=supplier_id)
@@ -347,7 +358,9 @@ def purchase(request):
 
             try:
                 decoded_file = csv_file.read().decode('utf-8').splitlines()
+                print(decoded_file)
                 reader = csv.DictReader(decoded_file)
+                print(reader)
                 for row in reader:
                     row = {key.strip(): value.strip() for key, value in row.items() if key.strip()}  # Remove empty column keys
 
@@ -385,11 +398,13 @@ def purchase(request):
                         )
                         messages.success(request, f"CSV added successfully ")
                     else:
-                        print("Invalid Row:", row)  # Debugging
+                        print("hello")
+                        print("Invalid Row:", row)  
                         messages.error(request, f"Invalid supplier or branch in CSV row: {row}")
                         return redirect('adminside:purchase')
 
             except Exception as e:
+                print("hey")
                 print(e)
                 messages.error(request, f"Error processing CSV file: {str(e)}")
             
@@ -509,9 +524,14 @@ def inventory(request):
             file_path = default_storage.save(f"uploads/{csv_file.name}", ContentFile(csv_file.read()))
             with open(default_storage.path(file_path), 'r', encoding='utf-8') as file:
                 csv_reader = csv.reader(file)
-                next(csv_reader)  # Skip header row
-
+                next(csv_reader)  
                 for row in csv_reader:
+                    row = [col.strip() for col in row] 
+
+                    if not row or len(row) == 0 or not row[0]: 
+                        continue
+
+                    print(f"Purchase ID: {row[0]}")  
                     try:
                         purchase = Purchase.objects.get(purchase_id=row[0]) 
                         category = Categories.objects.get(categories_id=row[1])  
@@ -520,7 +540,11 @@ def inventory(request):
                         cost = int(row[4])
                         mfg_date = row[5]
                         exp_date = row[6]
-                        active = row[7].strip().lower() == "true"
+                        active = row[7].strip().lower() == "true" if len(row) > 7 and row[7].strip() else True
+                        image_name = row[8] if len(row) > 8 and row[8].strip() else None  # Get image filename
+
+                        # Set image path (assuming images are stored in 'media/uploads/')
+                        image_path = f"/{image_name}" if image_name else None
 
                         Inventory.objects.create(
                             purchase=purchase,
@@ -531,13 +555,15 @@ def inventory(request):
                             mfg_date=mfg_date,
                             exp_date=exp_date,
                             active=active,
+                            image=image_path  # Save image filename
                         )
                     except Exception as e:
-                        price(e)
+                        print(e)
                         messages.error(request, f"Error processing row: {row} - {str(e)}")
 
             messages.success(request, "CSV file uploaded successfully.")
             return redirect("adminside:inventory")
+
 
         item_id = request.POST.get("inventory_id")  
         if item_id:
@@ -572,12 +598,28 @@ def fooditems(request):
 # Tables View
 def tables(request):
     tables = Table.objects.all()
+    branches=Branch.objects.all()
+    selected_branch = None
+
+    branch_id = request.GET.get("branch_id") 
+    status = request.GET.get('status', None)
+
+    if branch_id and branch_id.isdigit():
+        branch_id = int(branch_id)
+        try:
+            selected_branch = Branch.objects.get(branch_id=branch_id)  
+            tables = tables.filter(branch__branch_id=branch_id)  
+        except Branch.DoesNotExist:
+            messages.error(request, "Branch not found.")
+
+    if status and status in ["vacant", "occupied", "reserved"]:
+        tables = tables.filter(status=status)  
     
     if request.method == "POST":
         table_id = request.POST.get("table_id")
         status = request.POST.get("status")
         seats = request.POST.get("seats")
-
+        branch_id = request.POST.get("branch_id")
         if table_id:
             table_id = "".join(filter(str.isdigit, table_id))
 
@@ -590,13 +632,17 @@ def tables(request):
             except Table.DoesNotExist:
                 messages.error(request, "Table not found.")
 
-        if seats:
-            table = Table.objects.create(seats=int(seats), status="vacant")
-            messages.success(request, f'Table with {table.seats} seats added successfully.')
+        if seats and branch_id:
+            try:
+                branch = Branch.objects.get(branch_id=branch_id)
+                table = Table.objects.create(seats=int(seats), status="vacant", branch=branch)
+                messages.success(request, f'Table with {table.seats} seats added successfully to {branch.location}.')
+            except Branch.DoesNotExist:
+                messages.error(request, "Invalid branch selected.")
 
         return redirect("adminside:tables")
 
-    return render_page(request, 'adminside/tables.html', {"tables": tables})
+    return render_page(request, 'adminside/tables.html', {"tables": tables,"selected_branch": selected_branch,"branches":branches,'selected_status': status})
     
 
 # Customer View

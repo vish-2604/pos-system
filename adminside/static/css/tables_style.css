@@ -10,15 +10,20 @@
   margin: 5px;
   width: 100%;
 }
+
 .table-container {
   width: 50%;
 }
+
 .form-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px; /* Space between cards */
-  justify-content: center; /* Center align */
+  gap: 15px;
+  /* Space between cards */
+  justify-content: center;
+  /* Center align */
 }
+
 .form-title {
   display: flex;
   gap: 15px;
@@ -35,8 +40,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 200px; /* Set a fixed width */
-  height: 200px; /* Set a fixed height */
+  width: 200px;
+  /* Set a fixed width */
+  height: 200px;
+  /* Set a fixed height */
   background: #f8f8f8;
   border-radius: 10px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
@@ -61,9 +68,11 @@
   margin-top: 1.5rem !important;
   margin-right: 5px;
 }
+
 .btn-icon {
   display: none;
 }
+
 .table-bar {
   width: 100%;
   height: 45px;
@@ -75,9 +84,11 @@
   font-weight: bold;
   color: #000;
 }
+
 .nav-pills .nav-link:hover {
   color: #4e598c;
 }
+
 .nav-pills .nav-link.active {
   background-color: #4e598c;
   border: #4e598c;
@@ -92,7 +103,8 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 2000; /* Increase z-index */
+  z-index: 2000;
+  /* Increase z-index */
 }
 
 .form-popup {
@@ -104,7 +116,8 @@
   background: white;
   padding: 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  z-index: 3000; /* Ensure popup is above overlay */
+  z-index: 3000;
+  /* Ensure popup is above overlay */
 }
 
 
@@ -152,6 +165,7 @@
   font-weight: bold;
   color: #000;
 }
+
 .seat {
   width: 25px;
   height: 8px;
@@ -159,6 +173,7 @@
   border-radius: 5px;
   position: absolute;
 }
+
 .seat.top.left {
   top: 45px;
   left: 35%;
@@ -186,9 +201,11 @@
 .seat.top {
   top: 45px;
 }
+
 .seat.bottom {
   bottom: 45px;
 }
+
 .seat.left {
   left: 40px;
   transform: rotate(90deg);
@@ -198,6 +215,7 @@
   right: 40px;
   transform: rotate(90deg);
 }
+
 p {
   margin-bottom: 0;
 }
@@ -205,17 +223,20 @@ p {
 .vacant {
   border-bottom: 5px solid #2a9c00;
 }
+
 .occupied {
   border-bottom: 5px solid #ff0000;
 }
+
 .reserved {
   border-bottom: 5px solid #f7c93c;
 }
 
-@media screen and (max-width: 1105px) {
+@media screen and (max-width: 1240px) {
   .table-container {
     width: 70%;
   }
+
   .btn-text {
     display: none;
   }
@@ -223,66 +244,113 @@ p {
   .btn-icon {
     display: inline-block;
     font-size: 18px;
-    height: 28px;
+    height: 25px;
     border-radius: 2px;
-    width: 28px;
-  }
-}
-@media screen and (max-width: 960px) {
-  .table-container {
-    width: 70%;
-  }
-}
-@media screen and (max-width: 880px) {
-  .table-container {
-    width: 75%;
-  }
-  .table-bar {
-    padding-top: 1px;
-    overflow-x: auto;
-    white-space: nowrap;
-    display: flex;
-  }
-  .nav-pills {
-    flex-wrap: nowrap;
+    width: 25px;
   }
 
-  .nav-item {
-    flex: 0 0 auto;
+  .table-title {
+    display: block;
   }
-}
-@media screen and (max-width: 800px) {
+
   .table-bar {
+    width: fit-content;
+    /* Makes sure it wraps around the content */
+    margin: 0 auto;
+    /* Centers horizontally */
+  }
+
+  .table-container {
     width: 100%;
   }
-}
 
-@media screen and (max-width: 675px) {
-  .table-container {
-    width: 80%;
+  .right-side {
+    align-items: center;
+    justify-content: center;
   }
 }
 
-@media screen and (max-width: 607px) {
+@media screen and (max-width: 550px) {
   .table-bar {
-    padding-top: 1px;
-    overflow-x: auto;
-    white-space: nowrap;
-    display: flex;
-  }
-  .nav-pills {
-    flex-wrap: nowrap;
+    width: 100%;
+    height: 80px;
+    background-color: white;
+    align-content: center;
   }
 
-  .nav-item {
-    flex: 0 0 auto;
+  .nav {
+    margin-top: 5px;
+    justify-content: center;
   }
 }
-@media screen and (max-width: 450px) {
+
+#branchDropdown {
+  min-width: 200px;
+  padding: 10px;
+  margin-top: 25px;
+  border-radius: 10px;
+}
+
+@media screen and (max-width: 370px) {
   .table-bar {
-    width: 75%;
+    width: 100%;
+    height: 100px;
+    background-color: white;
+    align-content: center;
+  }
+
+  .nav {
+    margin-top: 5px;
+    justify-content: center;
+  }
+
+
+#branchDropdown {
+  min-width: 217px;
+}
+
+.right-side {
+  display: block !important;
+  text-align: center; /* Centers inline elements */
+}
+
+.right-side select,
+.right-side button {
+  display: block;  /* Make them take full width */
+  width: 80%;  /* Adjust width for better appearance */
+  margin: 10px auto; /* Center horizontally */
+}
+
+/* Centering the button content */
+.right-side button {
+  display: flex; 
+  justify-content: center;  /* Center horizontally */
+  align-items: center;  /* Center vertically */
+  gap: 5px; /* Add space between icon and text */
+  text-align: center; /* Ensure text alignment */
+}
+
+/* Ensuring icon is properly aligned */
+.right-side button .btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-side button i {
+  font-size: 16px; /* Adjust icon size if needed */
+}
+}
+
+@media screen and (max-width: 320px) {
+  .table-bar {
+    width: 100%;
+    height: 170px;
+    background-color: white;
+    align-content: center;
   }
 }
+
 @media screen and (max-width: 350px) {
   .seat.left {
     left: 20px;
@@ -316,7 +384,8 @@ p {
   top: 20px;
   right: 20px;
   z-index: 1000;
-  width: 300px; /* Adjust as needed */
+  width: 300px;
+  /* Adjust as needed */
 }
 
 .alert {
@@ -330,18 +399,23 @@ p {
 }
 
 .alert-success {
-  background-color: #4E598C; /* Deep Blue */
+  background-color: #4E598C;
+  /* Deep Blue */
+  border-color: #4E598C;
   color: white;
 }
 
 .alert-warning {
-  background-color: #FF8C42; /* Vibrant Orange */
+  background-color: #FF8C42;
+  /* Vibrant Orange */
   color: white;
 }
 
 .alert-info {
-  background-color: #F9C784; /* Soft Yellow */
-  color: #4E598C; /* Deep Blue text */
+  background-color: #F9C784;
+  /* Soft Yellow */
+  color: #4E598C;
+  /* Deep Blue text */
 }
 
 .alert::after {
@@ -357,14 +431,27 @@ p {
 }
 
 @keyframes progressBar {
-  0% { width: 100%; }
-  100% { width: 0; }
+  0% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0;
+  }
 }
 
 @keyframes fadeOut {
-  0% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 
@@ -398,4 +485,68 @@ p {
 .form-check-label {
   font-size: 1.1rem;
   margin-left: 0.8rem;
+}
+
+/* Notification Box */
+.alert-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ffcc80;
+  /* Light orange */
+  color: white;
+  /* Dark text */
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 1000;
+  overflow: hidden;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Progress Bar Inside Alert */
+.progress-bar {
+  height: 4px;
+  background-color: white;
+  /* White Progress Bar */
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  animation: progressFade 3s linear forwards;
+}
+
+/* Keyframe for Progress Bar */
+@keyframes progressFade {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+/* Alert Box Variants */
+.alert-box.info {
+  background-color: #FF8C42;
+}
+
+.alert-box.success {
+  background-color: #4E598C;
+}
+
+.alert-box.error {
+  background-color: #F9C784;
+}
+
+.right-side {
+  display: flex;
+  gap: 5px;
 }

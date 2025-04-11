@@ -15,8 +15,8 @@
 </div>
 {% endif %}
 <div class="print-receipt">
-    <h2>Coffee Shop</h2>
-    <p>Location: {{ sale.order.branch.location }}<br>Tel.: {{ sale.order.branch.phone_no }}</p>
+    <h2>Surbhi</h2>
+    <p style="text-align: center;">Location: {{ sale.order.branch.location }}<br>Area: {{ sale.order.branch.area }}<br>Tel.: {{ sale.order.branch.phone_no }}</p>
     <hr>
     <p><strong>Store:</strong> {{ sale.order.branch.branch_id }} &nbsp;&nbsp;&nbsp; {{sale.order.created_at|date:"d-m-Y H:i A" }}</p>
     <p><strong>Server:</strong> {{ sale.order.staff.staff_role }}</p>
@@ -51,34 +51,64 @@
     <hr>
     <p class="text-center">THANK YOU!</p>
 
-    <!-- Barcode -->
     <div class="barcode text-center">
         <img src="{{ barcode_url }}" alt="Barcode">
     </div>
 </div>
 
-<!-- Button Container -->
 <div class="button-container">
     <a href="javascript:history.back()" class="btn">
         <i class="fas fa-arrow-left"></i> Back
     </a>
+
     <button onclick="window.print()" class="btn">
         <i class="fas fa-print"></i> Print
     </button>
 
-    <!-- Rating Button -->
+    <button onclick="openEmailModal()" class="btn">
+        <i class="fas fa-envelope"></i> E-Bill
+    </button>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEmailModal()">&times;</span>
+            <h3>Enter Your Email</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="email" name="email" id="emailInput" required placeholder="Enter email"
+                    class="form-control mt-2">
+                <button type="submit" name="send_email" class="btn mt-3">Send Bill</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEmailModal() {
+            document.getElementById("emailModal").style.display = "flex";
+        }
+
+        function closeEmailModal() {
+            document.getElementById("emailModal").style.display = "none";
+        }
+
+        window.onclick = function (event) {
+            let modal = document.getElementById("emailModal");
+            if (event.target === modal) {
+                closeEmailModal();
+            }
+        };
+    </script>
+
     <button onclick="openRatingModal()" class="btn">
         <i class="fas fa-star"></i> Rate Us
     </button>
 </div>
 
-<!-- Rating Modal -->
 <div id="ratingModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeRatingModal()">&times;</span>
         <h3>Rate Your Experience</h3>
 
-        <!-- Rating Form -->
         <form id="ratingForm" method="POST" action="">
             {% csrf_token %}
             <input type="hidden" id="ratingInput" name="rating" value="">
@@ -129,18 +159,15 @@
             }
         };
 
-        // Close modal when clicking outside
         window.onclick = function (event) {
             if (event.target === ratingModal) {
                 closeRatingModal();
             }
         };
 
-        // Close modal when clicking "X"
         document.querySelector(".close").addEventListener("click", closeRatingModal);
     });
 </script>
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

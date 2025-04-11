@@ -59,7 +59,7 @@
     <div class="card mt-4 p-3">
         <h3>Sales Details</h3>
         <div class="d-flex mb-3">
-            <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by order id or date">
+            <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by order id">
             <span>
                 <button class="search-btn btn btn-outline-primary" style="background-color: #f9c784;color: black;"
                     onclick="filterTable()">
@@ -67,12 +67,32 @@
                 </button>
             </span>
         </div>
+        <script>
+            function filterTable() {
+                let searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
+                let tableRows = document.querySelectorAll("tbody tr");
+        
+                tableRows.forEach(row => {
+                    let orderId = row.cells[0].textContent.replace("#", "").trim().toLowerCase(); // Remove #
+        
+                    if (searchInput === "" || orderId.includes(searchInput)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+        
+            document.getElementById("searchInput").addEventListener("input", filterTable);
+        </script>
+        
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Order ID</th>
                         <th>Table ID</th>
+                        <th>Staff</th>
                         <th>Total amount</th>
                         <th>Payment Method</th>
                         <th>Date</th>
@@ -87,6 +107,7 @@
                     <tr>
                         <td>#{{ sale.order.order_id }}</td>
                         <td>{{ sale.order.table.table_id }}</td>
+                        <td>{{ sale.order.staff.staff_fullname }}</td>
                         <td>₹ {{ sale.order.total_amount }}</td>
                         <td>{{ sale.payment_method }}</td>
                         <td>{{ sale.date }}</td>
