@@ -110,8 +110,8 @@
     <br />
     <div class="d-flex flex-wrap justify-content-center">
       {% for table in tables %}
-      {% if table.status == "disabled" %}
-      <div class="table-card reserved" data-table-number="T-{{ table.table_id }}" data-status="Disabled"
+      {% if table.status == "reserved" %}
+      <div class="table-card reserved" data-table-number="T-{{ table.table_id }}" data-status="reserved"
         data-num-people="{{ table.seats }}" data-ordered-items="[]">
         <div class="table-shape">
           <p class="table-text">T-{{ table.table_id }}</p>
@@ -236,11 +236,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
           document.querySelectorAll('.order-details').forEach(order => order.style.display = "none");
 
+          document.getElementById("status").value = currentStatus; 
+
+          let toggle = document.getElementById("reservedToggle");
+          toggle.checked = (currentStatus.toLowerCase() === "reserved");
+
+
           const orderDetails = document.getElementById(`order-table-${tableId}`);
           if (orderDetails) {
             orderDetails.style.display = "block";
           }
-
+          
           $('#orderModal').modal('show');
         } else {
           document.getElementById('table_id').value = tableId;

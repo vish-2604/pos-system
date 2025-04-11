@@ -12,6 +12,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         ist = timezone("Asia/Kolkata")  # Indian Standard Time (IST)
+
+        for item in Inventory.objects.all():
+            item.save()
+        self.stdout.write(self.style.SUCCESS("Triggered save() on all Inventory items."))
         
         # Get today's date in IST
         today_ist = localtime(now(), ist).date()
@@ -31,8 +35,6 @@ class Command(BaseCommand):
             # Determine if the item is expiring today, tomorrow, or the day before expiry
             if item.exp_date == today_ist:
                 expiry_day = "today"
-                item.active = False
-                item.save(update_fields=['active'])
             elif item.exp_date == tomorrow_ist:
                 expiry_day = "tomorrow"
             else:

@@ -12,6 +12,8 @@ from django.utils import timezone # type: ignore
 from django.utils.timezone import now  # type: ignore
 from django.core.exceptions import ObjectDoesNotExist # type: ignore
 from django.core.validators import RegexValidator # type: ignore
+from django.utils.timezone import localtime, now # type: ignore
+from pytz import timezone # type: ignore
 
 def get_notification():
     Notification = apps.get_model('staffside', 'Notification')
@@ -255,9 +257,20 @@ class Inventory(models.Model):
             except ObjectDoesNotExist:
                 pass
 
-        if self.quantity == 0:
-            self.active = False  
-            get_notification().objects.create(user=self.purchase.branch.manager,message=f"{self.purchase.food_item} is out of stock!")
+        # Handle expiry check
+        ist = timezone("Asia/Kolkata")
+        today_ist = localtime(now(), ist).date()
+
+        if self.exp_date and self.exp_date <= today_ist:
+            self.active = False
+            get_notification().objects.get_or_create(
+                user=self.purchase.branch.manager,
+                message=f"{self.purchase.food_item} has expired on {self.exp_date} and has been deactivated."
+            )
+
+            if self.quantity == 0:
+                self.active = False  
+                get_notification().objects.create(user=self.purchase.branch.manager,message=f"{self.purchase.food_item} is out of stock!")
 
 
         super().save(*args, **kwargs)
